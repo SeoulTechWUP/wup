@@ -1,10 +1,11 @@
 package wup.data;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 사용자 그룹 정보를 관리하는 클래스입니다.
- * 
+ *
  * @author dmsql
  */
 public class Group implements ItemOwner {
@@ -14,52 +15,52 @@ public class Group implements ItemOwner {
     private User owner;
     private String name;
     private List<User> members;
-    
+
     // Getters
-    
+
     public int getId() {
-	return id;
+        return id;
     }
-    
+
     public Date getCreatedAt() {
-	return createdAt;
+        return createdAt;
     }
-    
+
     public Date getModifiedAt() {
-	return modifiedAt;
+        return modifiedAt;
     }
-    
+
     public User getOwner() {
-	return owner;
+        return owner;
     }
-    
+
     public String getName() {
-	return name;
+        return name;
     }
-    
+
     public List<User> getMembers() {
-	return members;
+        return members;
     }
-    
+
     // Setters
-    
+
     public void setId(int id) {
-	this.id = id;
+        this.id = id;
     }
-    
+
     public void setCreatedAt(Date createdAt) {
-	this.createdAt = createdAt;
+        this.createdAt = createdAt;
     }
-    
+
     public void setModifiedAt(Date modifiedAt) {
-	this.modifiedAt = modifiedAt;
+        this.modifiedAt = modifiedAt;
     }
-    
+
     public void setOwner(User owner) {
-	this.owner = owner;
+        this.owner = owner;
     }
-    
+
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 }

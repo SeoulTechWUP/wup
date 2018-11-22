@@ -18,52 +18,52 @@ public class Planner {
     // Getters
 
     public int getId() {
-	return id;
+        return id;
     }
 
     public Date getCreatedAt() {
-	return createdAt;
+        return createdAt;
     }
 
     public Date getModifiedAt() {
-	return modifiedAt;
+        return modifiedAt;
     }
 
-    public ItemOwner.Type getType(){
-	return type;
+    public ItemOwner.Type getType() {
+        return type;
     }
 
     public ItemOwner getOwner() {
-	return owner;
+        return owner;
     }
 
     public String getTitle() {
-	return title;
+        return title;
     }
 
     // Setters
 
     public void setId(int id) {
-	this.id = id;
+        this.id = id;
     }
 
     public void setCreatedAt(Date createdAt) {
-	this.createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public void setModifiedAt(Date modifiedAt) {
-	this.modifiedAt = modifiedAt;
+        this.modifiedAt = modifiedAt;
     }
 
     public void setType(ItemOwner.Type type) {
-	this.type = type;
+        this.type = type;
     }
 
     public void setOwner(ItemOwner owner) {
-	this.owner = owner;
+        this.owner = owner;
     }
 
     public void setTitle(String title) {
-	this.title = title;
+        this.title = title;
     }
 }

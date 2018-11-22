@@ -20,68 +20,68 @@ public class User implements ItemOwner {
     // Getters
 
     public int getId() {
-	return id;
+        return id;
     }
 
     public Date getCreatedAt() {
-	return createdAt;
+        return createdAt;
     }
 
     public Date getModifiedAt() {
-	return modifiedAt;
+        return modifiedAt;
     }
 
     public String getEmail() {
-	return email;
+        return email;
     }
 
     public String getFullName() {
-	return fullName;
+        return fullName;
     }
 
     public String getNickname() {
-	return nickname;
+        return nickname;
     }
 
     public boolean getIsVerified() {
-	return isVerified;
+        return isVerified;
     }
 
     public String getAvatar() {
-	return avatar;
+        return avatar;
     }
 
     // Setters
 
     public void setId(int id) {
-	this.id = id;
+        this.id = id;
     }
 
     public void setCreatedAt(Date createdAt) {
-	this.createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public void setModifiedAt(Date modifiedAt) {
-	this.modifiedAt = modifiedAt;
+        this.modifiedAt = modifiedAt;
     }
 
     public void setEmail(String email) {
-	this.email = email;
+        this.email = email;
     }
 
     public void setFullName(String fullName) {
-	this.fullName = fullName;
+        this.fullName = fullName;
     }
 
     public void setNickname(String nickname) {
-	this.nickname = nickname;
+        this.nickname = nickname;
     }
 
     public void setIsVerified(boolean isVerified) {
-	this.isVerified = isVerified;
+        this.isVerified = isVerified;
     }
 
     public void setAvatar(String avatar) {
-	this.avatar = avatar;
+        this.avatar = avatar;
     }
 }

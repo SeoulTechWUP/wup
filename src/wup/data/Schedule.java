@@ -1,6 +1,6 @@
 package wup.data;
 
-import java.util.*;
+import java.util.Date;
 
 /**
  * 일정 정보를 관리하는 클래스입니다.
@@ -21,82 +21,82 @@ public class Schedule {
     // private object[] labels;
 
     public int getId() {
-	return id;
+        return id;
     }
 
     public Date getCreatedAt() {
-	return createdAt;
+        return createdAt;
     }
 
     public Date getModifiedAt() {
-	return modifiedAt;
+        return modifiedAt;
     }
 
     public Planner getPlanner() {
-	return planner;
+        return planner;
     }
 
     public String getTitle() {
-	return title;
+        return title;
     }
 
     public String getDescription() {
-	return description;
+        return description;
     }
 
     public String getLocation() {
-	return location;
+        return location;
     }
 
     public Date getStartsAt() {
-	return startsAt;
+        return startsAt;
     }
 
     public Date getEndsAt() {
-	return endsAt;
+        return endsAt;
     }
 
     public boolean getAllDay() {
-	return allDay;
+        return allDay;
     }
 
     public void setId(int id) {
-	this.id = id;
+        this.id = id;
     }
 
     public void setCreatedAt(Date createdAt) {
-	this.createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public void setModifiedAt(Date modifiedAt) {
-	this.modifiedAt = modifiedAt;
+        this.modifiedAt = modifiedAt;
     }
 
     public void setPlanner(Planner planner) {
-	this.planner = planner;
+        this.planner = planner;
     }
 
     public void setTitle(String title) {
-	this.title = title;
+        this.title = title;
     }
 
     public void setDescription(String description) {
-	this.description = description;
+        this.description = description;
     }
 
     public void setLocation(String location) {
-	this.location = location;
+        this.location = location;
     }
 
     public void setStartsAt(Date startsAt) {
-	this.startsAt = startsAt;
+        this.startsAt = startsAt;
     }
 
     public void setEndsAt(Date endsAt) {
-	this.endsAt = endsAt;
+        this.endsAt = endsAt;
     }
 
     public void setAllDay(boolean allDay) {
-	this.allDay = allDay;
+        this.allDay = allDay;
     }
 }

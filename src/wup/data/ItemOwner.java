@@ -7,7 +7,6 @@ package wup.data;
  */
 public interface ItemOwner {
     public enum Type {
-	USER,
-	OWNER
+        USER, OWNER
     }
 }

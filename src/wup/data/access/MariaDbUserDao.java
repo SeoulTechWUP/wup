@@ -100,11 +100,10 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
     /*
      * (non-Javadoc)
      *
-     * @see wup.data.access.UserDao#updateUser(int, wup.data.User, java.lang.String,
-     * java.lang.String)
+     * @see wup.data.access.UserDao#updateUser(int, wup.data.User)
      */
     @Override
-    public DaoResult<User> updateUser(int id, User user, String oldAuth, String newAuth) {
+    public DaoResult<User> updateUser(int id, User user) {
         try (Connection conn = getConnection("jdbc/mariadb");
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             DaoResult<User> getUserResult = getUser(id);

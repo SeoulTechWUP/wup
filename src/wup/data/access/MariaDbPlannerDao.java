@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import wup.data.Group;
 import wup.data.ItemOwner;
 import wup.data.Planner;
 import wup.data.User;
@@ -200,7 +201,13 @@ public class MariaDbPlannerDao extends JdbcDao implements PlannerDao {
                     throw getUserResult.getException();
                 }
             } else {
-                // GroupDao is not implemented yet.
+                DaoResult<Group> getGroupResult = new MariaDbGroupDao().getGroup(rs.getInt("group_id"));
+
+                if (getGroupResult.didSucceed()) {
+                    planner.setOwner(getGroupResult.getData());
+                } else {
+                    throw getGroupResult.getException();
+                }
             }
         }
 

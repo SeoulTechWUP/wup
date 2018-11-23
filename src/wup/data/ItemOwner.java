@@ -9,4 +9,8 @@ public interface ItemOwner {
     public enum Type {
         USER, GROUP
     }
+
+    public int getId();
+
+    public void setId(int id);
 }

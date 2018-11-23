@@ -19,6 +19,7 @@ public class User implements ItemOwner {
 
     // Getters
 
+    @Override
     public int getId() {
         return id;
     }
@@ -53,6 +54,7 @@ public class User implements ItemOwner {
 
     // Setters
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }

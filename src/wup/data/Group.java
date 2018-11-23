@@ -18,6 +18,7 @@ public class Group implements ItemOwner {
 
     // Getters
 
+    @Override
     public int getId() {
         return id;
     }
@@ -44,6 +45,7 @@ public class Group implements ItemOwner {
 
     // Setters
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }

@@ -37,4 +37,21 @@ public interface UserDao {
      * @param id 삭제할 사용자의 일련번호
      */
     public DaoResult<Boolean> deleteUser(int id);
+
+    /**
+     * 주어진 이메일 주소와 암호를 이용하여 인증을 시도합니다.
+     *
+     * @param email 사용자 이메일 주소
+     * @param auth  암호
+     */
+    public DaoResult<Boolean> authenticate(String email, String auth);
+
+    /**
+     * 주어진 id에 해당하는 사용자의 암호를 변경합니다.
+     *
+     * @param id      암호를 변경할 사용자의 일련번호
+     * @param oldAuth 이전 암호
+     * @param newAuth 새로운 암호
+     */
+    public DaoResult<Boolean> updateAuth(int id, String oldAuth, String newAuth);
 }

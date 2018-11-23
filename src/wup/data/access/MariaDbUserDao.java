@@ -28,6 +28,9 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
     private static final String SQL_PARAM_VALUES = "(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_INSERT = "INSERT INTO `user` " + SQL_PARAM_NAMES + " VALUES " + SQL_PARAM_VALUES;
     private static final String SQL_UPDATE_BY_ID = "UPDATE `user` SET `modified_at`=?, `full_name`=?, `nickname`=?, `avatar`=? WHERE `id`=?";
+    private static final String SQL_AUTH_USER = "SELECT `id` FROM `user` WHERE `email` = ? AND `auth` = ?";
+    private static final String SQL_CHECK_AUTH = "SELECT `id` FROM `user` WHERE `id` = ? AND `auth` = ?";
+    private static final String SQL_UPDATE_AUTH = "UPDATE `user` SET `modified_at` = ?, `auth` = ? WHERE `id` = ?";
 
     /*
      * (non-Javadoc)
@@ -169,6 +172,62 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
             return DaoResult.succeed(DaoResult.Action.DELETE, deletedRows > 0);
         } catch (Exception e) {
             return DaoResult.fail(DaoResult.Action.DELETE, e);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see wup.data.access.UserDao#authenticate(java.lang.String, java.lang.String)
+     */
+    @Override
+    public DaoResult<Boolean> authenticate(String email, String auth) {
+        try (Connection conn = getConnection(CONN_NAME);
+             PreparedStatement stmt = conn.prepareStatement(SQL_AUTH_USER)) {
+            stmt.setString(1, email);
+            stmt.setString(2, hashAuth(auth));
+
+            try (ResultSet result = stmt.executeQuery()) {
+                if (result.next()) {
+                    return DaoResult.succeed(DaoResult.Action.READ, true);
+                } else {
+                    return DaoResult.succeed(DaoResult.Action.READ, false);
+                }
+            }
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.READ, e);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see wup.data.access.UserDao#updateAuth(int, java.lang.String,
+     * java.lang.String)
+     */
+    @Override
+    public DaoResult<Boolean> updateAuth(int id, String oldAuth, String newAuth) {
+        try (Connection conn = getConnection(CONN_NAME);
+             PreparedStatement checkStmt = conn.prepareStatement(SQL_CHECK_AUTH);
+             PreparedStatement updateStmt = conn.prepareStatement(SQL_UPDATE_AUTH)) {
+            checkStmt.setInt(1, id);
+            checkStmt.setString(2, hashAuth(oldAuth));
+
+            try (ResultSet checkResult = checkStmt.executeQuery()) {
+                if (!checkResult.next()) {
+                    return DaoResult.succeed(DaoResult.Action.READ, false);
+                }
+            }
+
+            updateStmt.setTimestamp(1, new Timestamp(new Date().getTime()));
+            updateStmt.setString(2, hashAuth(newAuth));
+            updateStmt.setInt(3, id);
+
+            updateStmt.executeUpdate();
+
+            return DaoResult.succeed(DaoResult.Action.UPDATE, true);
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.UPDATE, e);
         }
     }
 

@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Base64;
@@ -47,16 +48,7 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
                 User user = null;
 
                 if (result.next()) {
-                    user = new User();
-
-                    user.setId(result.getInt("id"));
-                    user.setCreatedAt(result.getTimestamp("created_at"));
-                    user.setModifiedAt(result.getTimestamp("modified_at"));
-                    user.setEmail(result.getString("email"));
-                    user.setFullName(result.getString("full_name"));
-                    user.setNickname(result.getString("nickname"));
-                    user.setIsVerified(result.getBoolean("verified"));
-                    user.setAvatar(result.getString("avatar"));
+                    user = getUserFromResultSet(result);
                 }
 
                 return DaoResult.succeed(DaoResult.Action.READ, user);
@@ -229,6 +221,21 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
         } catch (Exception e) {
             return DaoResult.fail(DaoResult.Action.UPDATE, e);
         }
+    }
+
+    static User getUserFromResultSet(ResultSet rs) throws SQLException {
+        User user = new User();
+
+        user.setId(rs.getInt("id"));
+        user.setCreatedAt(rs.getTimestamp("created_at"));
+        user.setModifiedAt(rs.getTimestamp("modified_at"));
+        user.setEmail(rs.getString("email"));
+        user.setFullName(rs.getString("full_name"));
+        user.setNickname(rs.getString("nickname"));
+        user.setIsVerified(rs.getBoolean("verified"));
+        user.setAvatar(rs.getString("avatar"));
+
+        return user;
     }
 
     private String hashAuth(String auth) throws NoSuchAlgorithmException {

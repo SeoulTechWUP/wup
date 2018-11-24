@@ -28,6 +28,10 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
     private static final String SQL_ADD_MEMBER = "INSERT INTO `membership` (`created_at`, `modified_at`, `user_id`, `group_id`) VALUES (?, ?, ?, ?)";
     private static final String SQL_REMOVE_MEMBER = "DELETE FROM `membership` WHERE `user_id` = ? AND `group_id` = ?";
 
+    public MariaDbGroupDao(JdbcConnectionProvider connectionProvider) {
+        super(connectionProvider);
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -53,7 +57,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<List<Group>> getGroups(User user) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_GET_BY_OWNER)) {
             stmt.setInt(1, user.getId());
 
@@ -82,7 +86,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<Group> createGroup(User user, Group group) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
             Timestamp now = new Timestamp(new Date().getTime());
 
@@ -120,7 +124,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<Group> updateGroup(int id, Group group) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             DaoResult<Group> getGroupResult = getGroup(id);
 
@@ -164,7 +168,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<Boolean> deleteGroup(int id) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
             stmt.setInt(1, id);
 
@@ -183,7 +187,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<Boolean> addMember(Group group, User user) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_ADD_MEMBER)) {
             Timestamp now = new Timestamp(new Date().getTime());
 
@@ -207,7 +211,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<Boolean> removeMember(Group group, User user) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_REMOVE_MEMBER)) {
             stmt.setInt(1, user.getId());
             stmt.setInt(2, group.getId());
@@ -228,7 +232,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
         group.setModifiedAt(rs.getTimestamp("modified_at"));
         group.setName(rs.getString("name"));
 
-        DaoResult<List<User>> getMembersResult = new MariaDbUserDao().getMembers(group);
+        DaoResult<List<User>> getMembersResult = new MariaDbUserDao(connectionProvider).getMembers(group);
 
         if (!getMembersResult.didSucceed()) {
             throw getMembersResult.getException();
@@ -237,7 +241,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
         group.setMembers(getMembersResult.getData());
 
         if (includeOwner) {
-            DaoResult<User> getUserResult = new MariaDbUserDao().getUser(rs.getInt("owner"));
+            DaoResult<User> getUserResult = new MariaDbUserDao(connectionProvider).getUser(rs.getInt("owner"));
 
             if (!getUserResult.didSucceed()) {
                 throw getUserResult.getException();

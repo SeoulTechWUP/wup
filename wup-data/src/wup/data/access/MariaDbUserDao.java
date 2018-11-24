@@ -36,6 +36,10 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
     private static final String SQL_CHECK_AUTH = "SELECT `id` FROM `user` WHERE `id` = ? AND `auth` = ?";
     private static final String SQL_UPDATE_AUTH = "UPDATE `user` SET `modified_at` = ?, `auth` = ? WHERE `id` = ?";
 
+    public MariaDbUserDao(JdbcConnectionProvider connectionProvider) {
+        super(connectionProvider);
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -61,7 +65,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<List<User>> getMembers(Group group) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_GET_MEMBERS)) {
             stmt.setInt(1, group.getId());
 
@@ -86,7 +90,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<User> createUser(User user, String auth) {
-        try (Connection conn = getConnection("jdbc/mariadb");
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
             Timestamp now = new Timestamp(new Date().getTime());
 
@@ -120,7 +124,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<User> updateUser(int id, User user) {
-        try (Connection conn = getConnection("jdbc/mariadb");
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             DaoResult<User> getUserResult = getUser(id);
 
@@ -176,7 +180,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<Boolean> deleteUser(int id) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
             stmt.setInt(1, id);
 
@@ -195,7 +199,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<Boolean> authenticate(String email, String auth) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_AUTH_USER)) {
             stmt.setString(1, email);
             stmt.setString(2, hashAuth(auth));
@@ -220,7 +224,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<Boolean> updateAuth(int id, String oldAuth, String newAuth) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement checkStmt = conn.prepareStatement(SQL_CHECK_AUTH);
              PreparedStatement updateStmt = conn.prepareStatement(SQL_UPDATE_AUTH)) {
             checkStmt.setInt(1, id);

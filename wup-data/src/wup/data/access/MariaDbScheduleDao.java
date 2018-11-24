@@ -27,6 +27,10 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
     private static final String SQL_UPDATE_BY_ID = "UPDATE `schedule` SET `modified_at` = ?, `title` = ?, `description` = ?, `location` = ?, `starts_at` = ?, `ends_at` = ?, `allday` = ? WHERE `id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `schedule` WHERE `id` = ?";
 
+    public MariaDbScheduleDao(JdbcConnectionProvider connectionProvider) {
+        super(connectionProvider);
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -52,7 +56,7 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
      */
     @Override
     public DaoResult<List<Schedule>> getSchedules(Planner planner) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_GET_BY_PLANNER)) {
             stmt.setInt(1, planner.getId());
 
@@ -81,7 +85,7 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
      */
     @Override
     public DaoResult<List<Schedule>> getSchedules(Planner planner, Date from, Date to) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_GET_BY_RANGE)) {
             Timestamp fromTS = new Timestamp(from.getTime());
             Timestamp toTS = new Timestamp(to.getTime());
@@ -117,7 +121,7 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
      */
     @Override
     public DaoResult<Schedule> createSchedule(Planner planner, Schedule schedule) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS)) {
             Timestamp now = new Timestamp(new Date().getTime());
             Timestamp startTS = new Timestamp(schedule.getStartsAt().getTime());
@@ -153,7 +157,7 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
      */
     @Override
     public DaoResult<Schedule> updateSchedule(int id, Schedule schedule) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             DaoResult<Schedule> getScheduleResult = getSchedule(id);
 
@@ -206,7 +210,7 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
      */
     @Override
     public DaoResult<Boolean> deleteSchedule(int id) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
             stmt.setInt(1, id);
 
@@ -233,7 +237,7 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
         // schedule.setLabels( ? );
 
         if (includePlanner) {
-            DaoResult<Planner> getPlannerResult = new MariaDbPlannerDao().getPlanner(rs.getInt("planner_id"));
+            DaoResult<Planner> getPlannerResult = new MariaDbPlannerDao(connectionProvider).getPlanner(rs.getInt("planner_id"));
 
             if (!getPlannerResult.didSucceed()) {
                 throw getPlannerResult.getException();

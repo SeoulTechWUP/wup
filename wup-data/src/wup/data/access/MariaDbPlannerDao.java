@@ -29,6 +29,10 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
     private static final String SQL_UPDATE_BY_ID = "UPDATE `planners` SET `modified_at` = ?, `title` = ? WHERE `id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `planners` WHERE `id` = ?";
 
+    public MariaDbPlannerDao(JdbcConnectionProvider connectionProvider) {
+        super(connectionProvider);
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -56,7 +60,8 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
     public DaoResult<List<Planner>> getPlanners(ItemOwner owner) {
         String sql = owner instanceof User ? SQL_GET_BY_USER : SQL_GET_BY_GROUP;
 
-        try (Connection conn = getConnection(CONN_NAME); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, owner.getId());
 
             try (ResultSet result = stmt.executeQuery()) {
@@ -87,7 +92,7 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
         String type = owner instanceof User ? "user" : "group";
         String sql = String.format(SQL_INSERT_FORMAT, type);
 
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             Timestamp now = new Timestamp(new Date().getTime());
 
@@ -118,7 +123,7 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
      */
     @Override
     public DaoResult<Planner> updatePlanner(int id, Planner planner) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             DaoResult<Planner> getPlannerResult = getPlanner(id);
 
@@ -162,7 +167,7 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
      */
     @Override
     public DaoResult<Boolean> deletePlanner(int id) {
-        try (Connection conn = getConnection(CONN_NAME);
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
             stmt.setInt(1, id);
 
@@ -186,7 +191,7 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
 
         if (includeOwner) {
             if (ownerType == ItemOwner.Type.USER) {
-                DaoResult<User> getUserResult = new MariaDbUserDao().getUser(rs.getInt("user_id"));
+                DaoResult<User> getUserResult = new MariaDbUserDao(connectionProvider).getUser(rs.getInt("user_id"));
 
                 if (getUserResult.didSucceed()) {
                     planner.setOwner(getUserResult.getData());
@@ -194,7 +199,7 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
                     throw getUserResult.getException();
                 }
             } else {
-                DaoResult<Group> getGroupResult = new MariaDbGroupDao().getGroup(rs.getInt("group_id"));
+                DaoResult<Group> getGroupResult = new MariaDbGroupDao(connectionProvider).getGroup(rs.getInt("group_id"));
 
                 if (getGroupResult.didSucceed()) {
                     planner.setOwner(getGroupResult.getData());

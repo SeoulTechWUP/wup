@@ -19,10 +19,10 @@ import wup.data.User;
  *
  * @author Eunbin Jeong
  */
-public class MariaDbPlannerDao extends JdbcDao implements PlannerDao {
+public class MariaDbPlannerDao extends MariaDbDao<Planner> implements PlannerDao {
 
-    private static final String CONN_NAME = "jdbc/mariadb";
-    private static final String SQL_GET_BY_ID = "SELECT * FROM `planners` WHERE `id` = ?";
+    private static final String TABLE_NAME = "planner";
+
     private static final String SQL_GET_BY_USER = "SELECT * FROM `planners` WHERE `type` = 'user' AND `user_id` = ?";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM `planners` WHERE `type` = 'group' AND `group_id` = ?";
     private static final String SQL_INSERT_FORMAT = "INSERT INTO `planners` (`created_at`, `modified_at`, `type`, `%s_id`, `title`) VALUES (?, ?, ?, ?, ?)";
@@ -36,22 +36,15 @@ public class MariaDbPlannerDao extends JdbcDao implements PlannerDao {
      */
     @Override
     public DaoResult<Planner> getPlanner(int id) {
-        try (Connection conn = getConnection(CONN_NAME);
-             PreparedStatement stmt = conn.prepareStatement(SQL_GET_BY_ID)) {
-            stmt.setInt(1, id);
+        return querySingleItem(TABLE_NAME, id, (rs) -> {
+            Planner planner = null;
 
-            try (ResultSet result = stmt.executeQuery()) {
-                Planner planner = null;
-
-                if (result.next()) {
-                    planner = getPlannerFromResultSet(result, true);
-                }
-
-                return DaoResult.succeed(DaoResult.Action.READ, planner);
+            if (rs.next()) {
+                planner = getPlannerFromResultSet(rs, true);
             }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.READ, e);
-        }
+
+            return DaoResult.succeed(DaoResult.Action.READ, planner);
+        });
     }
 
     /*

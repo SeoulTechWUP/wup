@@ -22,11 +22,10 @@ import wup.data.User;
  *
  * @author Eunbin Jeong
  */
-public class MariaDbUserDao extends JdbcDao implements UserDao {
+public class MariaDbUserDao extends MariaDbDao<User> implements UserDao {
 
-    private static final String CONN_NAME = "jdbc/mariadb";
+    private static final String TABLE_NAME = "user";
 
-    private static final String SQL_GET_BY_ID = "SELECT * FROM `user` WHERE `id`=?";
     private static final String SQL_GET_MEMBERS = "SELECT u.* FROM `user` u INNER JOIN `membership` m ON u.`id` = m.`user_id` WHERE m.`group_id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `user` WHERE `id`=?";
     private static final String SQL_PARAM_NAMES = "(`created_at`, `modified_at`, `email`, `auth`, `full_name`, `nickname`, `verified`, `avatar`)";
@@ -44,22 +43,15 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
      */
     @Override
     public DaoResult<User> getUser(int id) {
-        try (Connection conn = getConnection(CONN_NAME);
-             PreparedStatement stmt = conn.prepareStatement(SQL_GET_BY_ID)) {
-            stmt.setInt(1, id);
+        return querySingleItem(TABLE_NAME, id, (rs) -> {
+            User user = null;
 
-            try (ResultSet result = stmt.executeQuery()) {
-                User user = null;
-
-                if (result.next()) {
-                    user = getUserFromResultSet(result);
-                }
-
-                return DaoResult.succeed(DaoResult.Action.READ, user);
+            if (rs.next()) {
+                user = getUserFromResultSet(rs);
             }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.READ, e);
-        }
+
+            return DaoResult.succeed(DaoResult.Action.READ, user);
+        });
     }
 
     /*

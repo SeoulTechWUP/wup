@@ -17,11 +17,10 @@ import wup.data.User;
  *
  * @author Eunbin Jeong
  */
-public class MariaDbGroupDao extends JdbcDao implements GroupDao {
+public class MariaDbGroupDao extends MariaDbDao<Group> implements GroupDao {
 
-    private static final String CONN_NAME = "jdbc/mariadb";
+    private static final String TABLE_NAME = "group";
 
-    private static final String SQL_GET_BY_ID = "SELECT * FROM `group` WHERE `id` = ?";
     private static final String SQL_GET_BY_OWNER = "SELECT * FROM `group` WHERE `owner` = ?";
     private static final String SQL_INSERT = "INSERT INTO `group` (`created_at`, `modified_at`, `owner`, `name`) VALUES (?, ?, ?, ?)";
     private static final String SQL_UPDATE_BY_ID = "UPDATE `group` SET `modified_at` = ?, `name` = ? WHERE `id` = ?";
@@ -36,23 +35,15 @@ public class MariaDbGroupDao extends JdbcDao implements GroupDao {
      */
     @Override
     public DaoResult<Group> getGroup(int id) {
-        try (Connection conn = getConnection(CONN_NAME);
-             PreparedStatement stmt = conn.prepareStatement(SQL_GET_BY_ID)) {
-            stmt.setInt(1, id);
+        return querySingleItem(TABLE_NAME, id, (rs) -> {
+            Group group = null;
 
-            try (ResultSet result = stmt.executeQuery()) {
-                Group group = null;
-
-                if (result.next()) {
-                    group = getGroupFromResultSet(result, true);
-                }
-
-                return DaoResult.succeed(DaoResult.Action.READ, group);
+            if (rs.next()) {
+                group = getGroupFromResultSet(rs, true);
             }
 
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.READ, e);
-        }
+            return DaoResult.succeed(DaoResult.Action.READ, group);
+        });
     }
 
     /*

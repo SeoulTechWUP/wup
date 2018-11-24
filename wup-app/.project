@@ -3,6 +3,7 @@
 	<name>wup-app</name>
 	<comment></comment>
 	<projects>
+		<project>wup-data</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

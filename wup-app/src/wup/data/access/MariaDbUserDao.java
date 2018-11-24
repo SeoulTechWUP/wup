@@ -22,7 +22,7 @@ import wup.data.User;
  *
  * @author Eunbin Jeong
  */
-public class MariaDbUserDao extends MariaDbDao<User> implements UserDao {
+public class MariaDbUserDao extends MariaDbDao implements UserDao {
 
     private static final String TABLE_NAME = "user";
 

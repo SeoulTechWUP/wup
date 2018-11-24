@@ -17,7 +17,7 @@ import wup.data.User;
  *
  * @author Eunbin Jeong
  */
-public class MariaDbGroupDao extends MariaDbDao<Group> implements GroupDao {
+public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
 
     private static final String TABLE_NAME = "group";
 

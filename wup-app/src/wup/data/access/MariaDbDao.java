@@ -10,7 +10,7 @@ import java.sql.ResultSet;
  * @author Eunbin Jeong
  *
  */
-public abstract class MariaDbDao<T> extends JdbcDao {
+public abstract class MariaDbDao extends JdbcDao {
     @FunctionalInterface
     protected interface ResultSetFunction<U> {
         public DaoResult<U> process(ResultSet rs) throws Exception;
@@ -18,7 +18,7 @@ public abstract class MariaDbDao<T> extends JdbcDao {
 
     protected static final String CONN_NAME = "jdbc/mariadb";
 
-    protected DaoResult<T> querySingleItem(String tableName, int id, ResultSetFunction<T> func) {
+    protected <T> DaoResult<T> querySingleItem(String tableName, int id, ResultSetFunction<T> func) {
         String sql = String.format("SELECT * FROM `%s` WHERE `id` = ?", tableName);
 
         try (Connection conn = getConnection(CONN_NAME); PreparedStatement stmt = conn.prepareStatement(sql)) {

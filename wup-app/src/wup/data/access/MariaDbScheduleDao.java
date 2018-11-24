@@ -17,7 +17,7 @@ import wup.data.Schedule;
  *
  * @author Eunbin Jeong
  */
-public class MariaDbScheduleDao extends MariaDbDao<Schedule> implements ScheduleDao {
+public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
 
     private static final String TABLE_NAME = "schedule";
 

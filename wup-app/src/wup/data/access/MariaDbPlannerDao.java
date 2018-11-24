@@ -19,7 +19,7 @@ import wup.data.User;
  *
  * @author Eunbin Jeong
  */
-public class MariaDbPlannerDao extends MariaDbDao<Planner> implements PlannerDao {
+public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
 
     private static final String TABLE_NAME = "planner";
 

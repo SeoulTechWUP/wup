@@ -26,7 +26,6 @@ public class MariaDbGroupDao extends JdbcDao implements GroupDao {
     private static final String SQL_INSERT = "INSERT INTO `group` (`created_at`, `modified_at`, `owner`, `name`) VALUES (?, ?, ?, ?)";
     private static final String SQL_UPDATE_BY_ID = "UPDATE `group` SET `modified_at` = ?, `name` = ? WHERE `id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `group` WHERE `id` = ?";
-    private static final String SQL_GET_MEMBERS = "SELECT u.* FROM `user` u INNER JOIN `membership` m ON u.`id` = m.`user_id` WHERE m.`group_id` = ?";
     private static final String SQL_ADD_MEMBER = "INSERT INTO `membership` (`created_at`, `modified_at`, `user_id`, `group_id`) VALUES (?, ?, ?, ?)";
     private static final String SQL_REMOVE_MEMBER = "DELETE FROM `membership` WHERE `user_id` = ? AND `group_id` = ?";
 
@@ -189,31 +188,6 @@ public class MariaDbGroupDao extends JdbcDao implements GroupDao {
     /*
      * (non-Javadoc)
      *
-     * @see wup.data.access.GroupDao#getMembers(wup.data.Group)
-     */
-    @Override
-    public DaoResult<List<User>> getMembers(Group group) {
-        try (Connection conn = getConnection(CONN_NAME);
-             PreparedStatement stmt = conn.prepareStatement(SQL_GET_MEMBERS)) {
-            stmt.setInt(1, group.getId());
-
-            try (ResultSet result = stmt.executeQuery()) {
-                List<User> members = new ArrayList<User>();
-
-                while (result.next()) {
-                    members.add(MariaDbUserDao.getUserFromResultSet(result));
-                }
-
-                return DaoResult.succeed(DaoResult.Action.READ, members);
-            }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.READ, e);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
      * @see wup.data.access.GroupDao#addMember(wup.data.Group, wup.data.User)
      */
     @Override
@@ -263,7 +237,7 @@ public class MariaDbGroupDao extends JdbcDao implements GroupDao {
         group.setModifiedAt(rs.getTimestamp("modified_at"));
         group.setName(rs.getString("name"));
 
-        DaoResult<List<User>> getMembersResult = getMembers(group);
+        DaoResult<List<User>> getMembersResult = new MariaDbUserDao().getMembers(group);
 
         if (!getMembersResult.didSucceed()) {
             throw getMembersResult.getException();

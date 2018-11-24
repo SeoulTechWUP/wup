@@ -49,13 +49,6 @@ public interface GroupDao {
     public DaoResult<Boolean> deleteGroup(int id);
 
     /**
-     * 주어진 <code>group</code>의 모든 구성원의 리스트를 가져옵니다.
-     *
-     * @param group 구성원을 조회할 그룹
-     */
-    public DaoResult<List<User>> getMembers(Group group);
-
-    /**
      * 주어진 <code>group</code>에 구성원을 추가합니다.
      *
      * @param group 구성원을 추가할 그룹

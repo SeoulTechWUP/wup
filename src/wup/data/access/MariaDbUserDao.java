@@ -9,9 +9,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
+import wup.data.Group;
 import wup.data.User;
 
 /**
@@ -24,6 +27,7 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
     private static final String CONN_NAME = "jdbc/mariadb";
 
     private static final String SQL_GET_BY_ID = "SELECT * FROM `user` WHERE `id`=?";
+    private static final String SQL_GET_MEMBERS = "SELECT u.* FROM `user` u INNER JOIN `membership` m ON u.`id` = m.`user_id` WHERE m.`group_id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `user` WHERE `id`=?";
     private static final String SQL_PARAM_NAMES = "(`created_at`, `modified_at`, `email`, `auth`, `full_name`, `nickname`, `verified`, `avatar`)";
     private static final String SQL_PARAM_VALUES = "(?, ?, ?, ?, ?, ?, ?, ?)";
@@ -52,6 +56,31 @@ public class MariaDbUserDao extends JdbcDao implements UserDao {
                 }
 
                 return DaoResult.succeed(DaoResult.Action.READ, user);
+            }
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.READ, e);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see wup.data.access.UserDao#getMembers(wup.data.Group)
+     */
+    @Override
+    public DaoResult<List<User>> getMembers(Group group) {
+        try (Connection conn = getConnection(CONN_NAME);
+             PreparedStatement stmt = conn.prepareStatement(SQL_GET_MEMBERS)) {
+            stmt.setInt(1, group.getId());
+
+            try (ResultSet result = stmt.executeQuery()) {
+                List<User> members = new ArrayList<User>();
+
+                while (result.next()) {
+                    members.add(MariaDbUserDao.getUserFromResultSet(result));
+                }
+
+                return DaoResult.succeed(DaoResult.Action.READ, members);
             }
         } catch (Exception e) {
             return DaoResult.fail(DaoResult.Action.READ, e);

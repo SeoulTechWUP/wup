@@ -1,5 +1,8 @@
 package wup.data.access;
 
+import java.util.List;
+
+import wup.data.Group;
 import wup.data.User;
 
 /**
@@ -14,6 +17,13 @@ public interface UserDao {
      * @param id 사용자 일련번호
      */
     public DaoResult<User> getUser(int id);
+
+    /**
+     * 주어진 <code>group</code>의 모든 구성원의 리스트를 가져옵니다.
+     *
+     * @param group 구성원을 조회할 그룹
+     */
+    public DaoResult<List<User>> getMembers(Group group);
 
     /**
      * 새로운 사용자를 생성합니다.

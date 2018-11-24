@@ -108,6 +108,14 @@ public class MariaDbGroupDao extends JdbcDao implements GroupDao {
 
                 int createdGroupId = generatedKeys.getInt(1);
 
+                group.setId(createdGroupId);
+
+                DaoResult<Boolean> addMemberResult = addMember(group, user);
+
+                if (!addMemberResult.didSucceed()) {
+                    return DaoResult.fail(DaoResult.Action.CREATE, addMemberResult.getException());
+                }
+
                 return getGroup(createdGroupId);
             }
         } catch (Exception e) {

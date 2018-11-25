@@ -9,10 +9,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import wup.data.Group;
 import wup.data.User;
@@ -31,7 +33,6 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
     private static final String SQL_PARAM_NAMES = "(`created_at`, `modified_at`, `email`, `auth`, `full_name`, `nickname`, `verified`, `avatar`)";
     private static final String SQL_PARAM_VALUES = "(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_INSERT = "INSERT INTO `user` " + SQL_PARAM_NAMES + " VALUES " + SQL_PARAM_VALUES;
-    private static final String SQL_UPDATE_BY_ID = "UPDATE `user` SET `modified_at`=?, `full_name`=?, `nickname`=?, `avatar`=? WHERE `id`=?";
     private static final String SQL_AUTH_USER = "SELECT `id` FROM `user` WHERE `email` = ? AND `auth` = ?";
     private static final String SQL_CHECK_AUTH = "SELECT `id` FROM `user` WHERE `id` = ? AND `auth` = ?";
     private static final String SQL_UPDATE_AUTH = "UPDATE `user` SET `modified_at` = ?, `auth` = ? WHERE `id` = ?";
@@ -124,53 +125,26 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<User> updateUser(int id, User user) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
-            DaoResult<User> getUserResult = getUser(id);
+        DaoResult<User> getUserResult = getUser(id);
 
-            if (!getUserResult.didSucceed()) {
-                return getUserResult;
-            }
-
-            boolean shouldUpdateModifiedAt = false;
-            User oldUser = getUserResult.getData();
-            String newFullName = user.getFullName();
-            String newNickname = user.getNickname();
-            String newAvatar = user.getAvatar();
-
-            if (!newFullName.equals(oldUser.getFullName())) {
-                shouldUpdateModifiedAt = true;
-            }
-
-            if (!newNickname.equals(oldUser.getNickname())) {
-                shouldUpdateModifiedAt = true;
-            }
-
-            if (!newAvatar.equals(oldUser.getAvatar())) {
-                shouldUpdateModifiedAt = true;
-            }
-
-            Timestamp newModifiedAt = shouldUpdateModifiedAt ? new Timestamp(new Date().getTime())
-                    : new Timestamp(oldUser.getCreatedAt().getTime());
-
-            stmt.setTimestamp(1, newModifiedAt);
-            stmt.setString(2, newFullName);
-            stmt.setString(3, newNickname);
-            stmt.setString(4, newAvatar);
-            stmt.setInt(5, id);
-
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                generatedKeys.next();
-
-                int modifiedUserId = generatedKeys.getInt(1);
-
-                return getUser(modifiedUserId);
-            }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.UPDATE, e);
+        if (!getUserResult.didSucceed()) {
+            return getUserResult;
         }
+
+        User oldUser = getUserResult.getData();
+        List<Entry<String, String>> fieldMap = new ArrayList<>();
+
+        fieldMap.add(new SimpleEntry<String, String>("fullName", "full_name"));
+        fieldMap.add(new SimpleEntry<String, String>("nickname", "nickname"));
+        fieldMap.add(new SimpleEntry<String, String>("avatar", "avatar"));
+
+        DaoResult<Boolean> updateUserResult = updateSingleItem(TABLE_NAME, id, oldUser, user, fieldMap);
+
+        if (!updateUserResult.didSucceed()) {
+            return DaoResult.fail(DaoResult.Action.UPDATE, updateUserResult.getException());
+        }
+
+        return getUser(id);
     }
 
     /*

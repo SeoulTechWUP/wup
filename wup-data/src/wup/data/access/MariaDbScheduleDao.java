@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import wup.data.Planner;
 import wup.data.Schedule;
@@ -24,7 +26,6 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
     private static final String SQL_GET_BY_PLANNER = "SELECT * FROM `schedule` WHERE `planner` = ? ORDER BY `starts_at` ASC";
     private static final String SQL_GET_BY_RANGE = "SELECT * FROM `schedule` WHERE `planner` = ? AND (`starts_at` BETWEEN ? AND ? OR `ends_at` BETWEEN ? AND ?) ORDER BY `starts_at` ASC";
     private static final String SQL_CREATE = "INSERT INTO `schedule` (`created_at`, `modified_at`, `planner_id`, `title`, `description`, `starts_at`, `ends_at`, `allday`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_UPDATE_BY_ID = "UPDATE `schedule` SET `modified_at` = ?, `title` = ?, `description` = ?, `location` = ?, `starts_at` = ?, `ends_at` = ?, `allday` = ? WHERE `id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `schedule` WHERE `id` = ?";
 
     public MariaDbScheduleDao(JdbcConnectionProvider connectionProvider) {
@@ -157,50 +158,29 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
      */
     @Override
     public DaoResult<Schedule> updateSchedule(int id, Schedule schedule) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
-            DaoResult<Schedule> getScheduleResult = getSchedule(id);
+        DaoResult<Schedule> getScheduleResult = getSchedule(id);
 
-            if (!getScheduleResult.didSucceed()) {
-                return getScheduleResult;
-            }
-
-            boolean shouldUpdateModifiedAt = false;
-            Schedule oldSchedule = getScheduleResult.getData();
-            String newTitle = schedule.getTitle();
-            String newDescription = schedule.getDescription();
-            String newLocation = schedule.getLocation();
-            Date newStartsAt = schedule.getStartsAt();
-            Date newEndsAt = schedule.getEndsAt();
-            Boolean newAllday = schedule.getAllDay();
-
-            // TODO: 조건에 따라 수정 일시를 갱신할 지 여부를 결정할 것
-            shouldUpdateModifiedAt = true;
-
-            Timestamp newModifiedAt = shouldUpdateModifiedAt ? new Timestamp(new Date().getTime())
-                    : new Timestamp(oldSchedule.getModifiedAt().getTime());
-
-            stmt.setTimestamp(1, newModifiedAt);
-            stmt.setString(2, newTitle);
-            stmt.setString(3, newDescription);
-            stmt.setString(4, newLocation);
-            stmt.setTimestamp(5, new Timestamp(newStartsAt.getTime()));
-            stmt.setTimestamp(6, new Timestamp(newEndsAt.getTime()));
-            stmt.setBoolean(7, newAllday);
-            stmt.setInt(8, id);
-
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                generatedKeys.next();
-
-                int modifiedScheduleId = generatedKeys.getInt(1);
-
-                return getSchedule(modifiedScheduleId);
-            }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.UPDATE, e);
+        if (!getScheduleResult.didSucceed()) {
+            return getScheduleResult;
         }
+
+        Schedule oldSchedule = getScheduleResult.getData();
+        List<Entry<String, String>> fieldMap = new ArrayList<>();
+
+        fieldMap.add(new SimpleEntry<String, String>("title", "title"));
+        fieldMap.add(new SimpleEntry<String, String>("description", "description"));
+        fieldMap.add(new SimpleEntry<String, String>("location", "location"));
+        fieldMap.add(new SimpleEntry<String, String>("startsAt", "starts_at"));
+        fieldMap.add(new SimpleEntry<String, String>("endsAt", "ends_at"));
+        fieldMap.add(new SimpleEntry<String, String>("allDay", "allday"));
+
+        DaoResult<Boolean> updateScheduleResult = updateSingleItem(TABLE_NAME, id, oldSchedule, schedule, fieldMap);
+
+        if (!updateScheduleResult.didSucceed()) {
+            return DaoResult.fail(DaoResult.Action.UPDATE, updateScheduleResult.getException());
+        }
+
+        return getSchedule(id);
     }
 
     /*

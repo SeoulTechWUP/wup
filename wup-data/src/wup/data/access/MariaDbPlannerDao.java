@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import wup.data.Group;
 import wup.data.ItemOwner;
@@ -26,7 +28,6 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
     private static final String SQL_GET_BY_USER = "SELECT * FROM `planners` WHERE `type` = 'user' AND `user_id` = ?";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM `planners` WHERE `type` = 'group' AND `group_id` = ?";
     private static final String SQL_INSERT_FORMAT = "INSERT INTO `planners` (`created_at`, `modified_at`, `type`, `%s_id`, `title`) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_UPDATE_BY_ID = "UPDATE `planners` SET `modified_at` = ?, `title` = ? WHERE `id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `planners` WHERE `id` = ?";
 
     public MariaDbPlannerDao(JdbcConnectionProvider connectionProvider) {
@@ -123,41 +124,24 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
      */
     @Override
     public DaoResult<Planner> updatePlanner(int id, Planner planner) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
-            DaoResult<Planner> getPlannerResult = getPlanner(id);
+        DaoResult<Planner> getPlannerResult = getPlanner(id);
 
-            if (!getPlannerResult.didSucceed()) {
-                return getPlannerResult;
-            }
-
-            boolean shouldUpdateModifiedAt = false;
-            Planner oldPlanner = getPlannerResult.getData();
-            String newTitle = planner.getTitle();
-
-            if (!newTitle.equals(oldPlanner.getTitle())) {
-                shouldUpdateModifiedAt = true;
-            }
-
-            Timestamp newModifiedAt = shouldUpdateModifiedAt ? new Timestamp(new Date().getTime())
-                    : new Timestamp(oldPlanner.getCreatedAt().getTime());
-
-            stmt.setTimestamp(1, newModifiedAt);
-            stmt.setString(2, newTitle);
-            stmt.setInt(3, id);
-
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                generatedKeys.next();
-
-                int modifiedPlannerId = generatedKeys.getInt(1);
-
-                return getPlanner(modifiedPlannerId);
-            }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.UPDATE, e);
+        if (!getPlannerResult.didSucceed()) {
+            return getPlannerResult;
         }
+
+        Planner oldPlanner = getPlannerResult.getData();
+        List<Entry<String, String>> fieldMap = new ArrayList<>();
+
+        fieldMap.add(new SimpleEntry<String, String>("title", "title"));
+
+        DaoResult<Boolean> updatePlannerResult = updateSingleItem(TABLE_NAME, id, oldPlanner, planner, fieldMap);
+
+        if (!updatePlannerResult.didSucceed()) {
+            return DaoResult.fail(DaoResult.Action.UPDATE, updatePlannerResult.getException());
+        }
+
+        return getPlanner(id);
     }
 
     /*

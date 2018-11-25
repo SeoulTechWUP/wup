@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import wup.data.Group;
 import wup.data.User;
@@ -23,7 +25,6 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
 
     private static final String SQL_GET_BY_OWNER = "SELECT * FROM `group` WHERE `owner` = ?";
     private static final String SQL_INSERT = "INSERT INTO `group` (`created_at`, `modified_at`, `owner`, `name`) VALUES (?, ?, ?, ?)";
-    private static final String SQL_UPDATE_BY_ID = "UPDATE `group` SET `modified_at` = ?, `name` = ? WHERE `id` = ?";
     private static final String SQL_DELETE_BY_ID = "DELETE FROM `group` WHERE `id` = ?";
     private static final String SQL_ADD_MEMBER = "INSERT INTO `membership` (`created_at`, `modified_at`, `user_id`, `group_id`) VALUES (?, ?, ?, ?)";
     private static final String SQL_REMOVE_MEMBER = "DELETE FROM `membership` WHERE `user_id` = ? AND `group_id` = ?";
@@ -124,41 +125,24 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<Group> updateGroup(int id, Group group) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
-            DaoResult<Group> getGroupResult = getGroup(id);
+        DaoResult<Group> getGroupResult = getGroup(id);
 
-            if (!getGroupResult.didSucceed()) {
-                return getGroupResult;
-            }
-
-            boolean shouldUpdateModifiedAt = false;
-            Group oldGroup = getGroupResult.getData();
-            String newName = group.getName();
-
-            if (!newName.equals(oldGroup.getName())) {
-                shouldUpdateModifiedAt = true;
-            }
-
-            Timestamp newModifiedAt = shouldUpdateModifiedAt ? new Timestamp(new Date().getTime())
-                    : new Timestamp(oldGroup.getModifiedAt().getTime());
-
-            stmt.setTimestamp(1, newModifiedAt);
-            stmt.setString(2, newName);
-            stmt.setInt(3, id);
-
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                generatedKeys.next();
-
-                int modifiedGroupId = generatedKeys.getInt(1);
-
-                return getGroup(modifiedGroupId);
-            }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.UPDATE, e);
+        if (!getGroupResult.didSucceed()) {
+            return getGroupResult;
         }
+
+        Group oldGroup = getGroupResult.getData();
+        List<Entry<String, String>> fieldMap = new ArrayList<>();
+
+        fieldMap.add(new SimpleEntry<String, String>("name", "name"));
+
+        DaoResult<Boolean> updateGroupResult = updateSingleItem(TABLE_NAME, id, oldGroup, group, fieldMap);
+
+        if (!updateGroupResult.didSucceed()) {
+            return DaoResult.fail(DaoResult.Action.UPDATE, updateGroupResult.getException());
+        }
+
+        return getGroup(id);
     }
 
     /*

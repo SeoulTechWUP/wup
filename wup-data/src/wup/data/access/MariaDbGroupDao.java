@@ -25,7 +25,6 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
 
     private static final String SQL_GET_BY_OWNER = "SELECT * FROM `group` WHERE `owner` = ?";
     private static final String SQL_INSERT = "INSERT INTO `group` (`created_at`, `modified_at`, `owner`, `name`) VALUES (?, ?, ?, ?)";
-    private static final String SQL_DELETE_BY_ID = "DELETE FROM `group` WHERE `id` = ?";
     private static final String SQL_ADD_MEMBER = "INSERT INTO `membership` (`created_at`, `modified_at`, `user_id`, `group_id`) VALUES (?, ?, ?, ?)";
     private static final String SQL_REMOVE_MEMBER = "DELETE FROM `membership` WHERE `user_id` = ? AND `group_id` = ?";
 
@@ -152,16 +151,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
      */
     @Override
     public DaoResult<Boolean> deleteGroup(int id) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
-            stmt.setInt(1, id);
-
-            int deletedRows = stmt.executeUpdate();
-
-            return DaoResult.succeed(DaoResult.Action.DELETE, deletedRows > 0);
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.DELETE, e);
-        }
+        return deleteSingleItem(TABLE_NAME, id);
     }
 
     /*

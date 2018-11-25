@@ -26,7 +26,6 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
     private static final String SQL_GET_BY_PLANNER = "SELECT * FROM `schedule` WHERE `planner` = ? ORDER BY `starts_at` ASC";
     private static final String SQL_GET_BY_RANGE = "SELECT * FROM `schedule` WHERE `planner` = ? AND (`starts_at` BETWEEN ? AND ? OR `ends_at` BETWEEN ? AND ?) ORDER BY `starts_at` ASC";
     private static final String SQL_CREATE = "INSERT INTO `schedule` (`created_at`, `modified_at`, `planner_id`, `title`, `description`, `starts_at`, `ends_at`, `allday`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_DELETE_BY_ID = "DELETE FROM `schedule` WHERE `id` = ?";
 
     public MariaDbScheduleDao(JdbcConnectionProvider connectionProvider) {
         super(connectionProvider);
@@ -190,16 +189,7 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
      */
     @Override
     public DaoResult<Boolean> deleteSchedule(int id) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
-            stmt.setInt(1, id);
-
-            int deletedRows = stmt.executeUpdate();
-
-            return DaoResult.succeed(DaoResult.Action.DELETE, deletedRows > 0);
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.DELETE, e);
-        }
+        return deleteSingleItem(TABLE_NAME, id);
     }
 
     private Schedule getScheduleFromResultSet(ResultSet rs, boolean includePlanner) throws Exception {

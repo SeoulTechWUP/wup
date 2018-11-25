@@ -29,7 +29,6 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
     private static final String TABLE_NAME = "user";
 
     private static final String SQL_GET_MEMBERS = "SELECT u.* FROM `user` u INNER JOIN `membership` m ON u.`id` = m.`user_id` WHERE m.`group_id` = ?";
-    private static final String SQL_DELETE_BY_ID = "DELETE FROM `user` WHERE `id`=?";
     private static final String SQL_PARAM_NAMES = "(`created_at`, `modified_at`, `email`, `auth`, `full_name`, `nickname`, `verified`, `avatar`)";
     private static final String SQL_PARAM_VALUES = "(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_INSERT = "INSERT INTO `user` " + SQL_PARAM_NAMES + " VALUES " + SQL_PARAM_VALUES;
@@ -154,16 +153,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      */
     @Override
     public DaoResult<Boolean> deleteUser(int id) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
-            stmt.setInt(1, id);
-
-            int deletedRows = stmt.executeUpdate();
-
-            return DaoResult.succeed(DaoResult.Action.DELETE, deletedRows > 0);
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.DELETE, e);
-        }
+        return deleteSingleItem(TABLE_NAME, id);
     }
 
     /*

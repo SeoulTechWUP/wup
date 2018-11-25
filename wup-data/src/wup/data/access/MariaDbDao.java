@@ -93,4 +93,19 @@ public abstract class MariaDbDao {
             return DaoResult.fail(DaoResult.Action.UPDATE, e);
         }
     }
+
+    protected DaoResult<Boolean> deleteSingleItem(String tableName, int id) {
+        String sql = String.format("DELETE FROM `%s` WHERE `id` = ?", tableName);
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+
+            int deletedRows = stmt.executeUpdate();
+
+            return DaoResult.succeed(DaoResult.Action.DELETE, deletedRows > 0);
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.DELETE, e);
+        }
+    }
 }

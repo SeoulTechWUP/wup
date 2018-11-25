@@ -28,7 +28,6 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
     private static final String SQL_GET_BY_USER = "SELECT * FROM `planners` WHERE `type` = 'user' AND `user_id` = ?";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM `planners` WHERE `type` = 'group' AND `group_id` = ?";
     private static final String SQL_INSERT_FORMAT = "INSERT INTO `planners` (`created_at`, `modified_at`, `type`, `%s_id`, `title`) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_DELETE_BY_ID = "DELETE FROM `planners` WHERE `id` = ?";
 
     public MariaDbPlannerDao(JdbcConnectionProvider connectionProvider) {
         super(connectionProvider);
@@ -151,16 +150,7 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
      */
     @Override
     public DaoResult<Boolean> deletePlanner(int id) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_ID)) {
-            stmt.setInt(1, id);
-
-            int deletedRows = stmt.executeUpdate();
-
-            return DaoResult.succeed(DaoResult.Action.DELETE, deletedRows > 0);
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.DELETE, e);
-        }
+        return deleteSingleItem(TABLE_NAME, id);
     }
 
     private Planner getPlannerFromResultSet(ResultSet rs, boolean includeOwner) throws Exception {

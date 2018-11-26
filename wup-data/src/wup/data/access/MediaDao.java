@@ -34,14 +34,6 @@ public interface MediaDao {
     public DaoResult<Media> createMedia(Post post, Media media);
 
     /**
-     * 주어진 <code>id</code>에 해당하는 첨부 미디어의 정보를 변경합니다.
-     *
-     * @param id    변경할 미디어의 일련번호
-     * @param media 변경할 정보가 들어 있는 {@link Media} 개체
-     */
-    public DaoResult<Media> updateMedia(int id, Media media);
-
-    /**
      * 주어진 <code>id</code>에 해당하는 첨부 미디어를 삭제합니다.
      *
      * @param id 삭제할 미디어의 일련번호

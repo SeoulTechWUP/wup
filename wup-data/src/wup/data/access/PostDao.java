@@ -81,11 +81,4 @@ public interface PostDao {
      * @param id 삭제할 공개 게시물의 일련번호
      */
     public DaoResult<Boolean> deletePost(int id);
-
-    /**
-     * 주어진 <code>post</code>의 "좋아요" 표시된 횟수를 가져옵니다.
-     *
-     * @param post 정보를 조회할 공개 게시물
-     */
-    public DaoResult<Integer> getLikeCount(Post post);
 }

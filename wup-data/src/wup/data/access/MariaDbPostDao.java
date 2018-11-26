@@ -34,7 +34,6 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
     private static final String STUB_LIMIT = " ORDER BY `created_at` DESC LIMIT ?";
     private static final String STUB_RANGE = " AND `created_at` BETWEEN ? AND ? ORDER BY `created_at` DESC";
     private static final String SQL_INSERT_FORMAT = "INSERT INTO `post` (`created_at`, `modified_at`, `type`, `%s_id`, `schedule_id`, `title`, `text) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_LIKE_COUNT = "SELECT COUNT(`post_id`) FROM `like` WHERE `post_id` = ?";
 
     public MariaDbPostDao(JdbcConnectionProvider connectionProvider) {
         super(connectionProvider);
@@ -275,31 +274,6 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
     @Override
     public DaoResult<Boolean> deletePost(int id) {
         return deleteSingleItem(TABLE_NAME, id);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see wup.data.access.PostDao#getLikeCount(wup.data.Post)
-     */
-    @Override
-    public DaoResult<Integer> getLikeCount(Post post) {
-        try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_LIKE_COUNT)) {
-            stmt.setInt(1, post.getId());
-
-            try (ResultSet result = stmt.executeQuery()) {
-                int count = 0;
-
-                if (result.next()) {
-                    count = result.getInt(1);
-                }
-
-                return DaoResult.succeed(DaoResult.Action.READ, count);
-            }
-        } catch (Exception e) {
-            return DaoResult.fail(DaoResult.Action.READ, e);
-        }
     }
 
     private Post getPostFromResultSet(ResultSet rs, boolean includeOwner) throws Exception {

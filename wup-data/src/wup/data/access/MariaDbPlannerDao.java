@@ -25,9 +25,9 @@ public class MariaDbPlannerDao extends MariaDbDao implements PlannerDao {
 
     private static final String TABLE_NAME = "planner";
 
-    private static final String SQL_GET_BY_USER = "SELECT * FROM `planners` WHERE `type` = 'user' AND `user_id` = ?";
-    private static final String SQL_GET_BY_GROUP = "SELECT * FROM `planners` WHERE `type` = 'group' AND `group_id` = ?";
-    private static final String SQL_INSERT_FORMAT = "INSERT INTO `planners` (`created_at`, `modified_at`, `type`, `%s_id`, `title`) VALUES (?, ?, ?, ?, ?)";
+    private static final String SQL_GET_BY_USER = "SELECT * FROM `planner` WHERE `type` = 'user' AND `user_id` = ?";
+    private static final String SQL_GET_BY_GROUP = "SELECT * FROM `planner` WHERE `type` = 'group' AND `group_id` = ?";
+    private static final String SQL_INSERT_FORMAT = "INSERT INTO `planner` (`created_at`, `modified_at`, `type`, `%s_id`, `title`) VALUES (?, ?, ?, ?, ?)";
 
     public MariaDbPlannerDao(JdbcConnectionProvider connectionProvider) {
         super(connectionProvider);

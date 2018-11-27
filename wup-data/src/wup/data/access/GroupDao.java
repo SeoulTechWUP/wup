@@ -19,7 +19,7 @@ public interface GroupDao {
     public DaoResult<Group> getGroup(int id);
 
     /**
-     * 주어진 <code>user</code>가 소유하고 있는 모든 사용자 그룹의 리스트를 가져옵니다.
+     * 주어진 <code>user</code>가 소속되어 있는 모든 사용자 그룹의 리스트를 가져옵니다.
      *
      * @param user 조회할 사용자 개체
      */

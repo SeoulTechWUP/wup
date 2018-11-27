@@ -7,7 +7,7 @@ import java.util.Date;
  *
  * @author Eunbin Jeong
  */
-public class Planner {
+public class Planner implements TodoListOwner {
     private int id;
     private Date createdAt;
     private Date modifiedAt;
@@ -17,6 +17,7 @@ public class Planner {
 
     // Getters
 
+    @Override
     public int getId() {
         return id;
     }
@@ -43,6 +44,7 @@ public class Planner {
 
     // Setters
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }

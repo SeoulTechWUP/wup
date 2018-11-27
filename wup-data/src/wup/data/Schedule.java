@@ -7,7 +7,7 @@ import java.util.Date;
  *
  * @author Eunbin Jeong
  */
-public class Schedule {
+public class Schedule implements TodoListOwner {
     private int id;
     private Date createdAt;
     private Date modifiedAt;
@@ -20,6 +20,7 @@ public class Schedule {
     private boolean allDay;
     // private object[] labels;
 
+    @Override
     public int getId() {
         return id;
     }
@@ -60,6 +61,7 @@ public class Schedule {
         return allDay;
     }
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }

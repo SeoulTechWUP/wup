@@ -32,7 +32,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
     private static final String SQL_PARAM_NAMES = "(`created_at`, `modified_at`, `email`, `auth`, `full_name`, `nickname`, `verified`, `avatar`)";
     private static final String SQL_PARAM_VALUES = "(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_INSERT = "INSERT INTO `user` " + SQL_PARAM_NAMES + " VALUES " + SQL_PARAM_VALUES;
-    private static final String SQL_AUTH_USER = "SELECT `id` FROM `user` WHERE `email` = ? AND `auth` = ?";
+    private static final String SQL_AUTH_USER = "SELECT * FROM `user` WHERE `email` = ? AND `auth` = ?";
     private static final String SQL_CHECK_AUTH = "SELECT `id` FROM `user` WHERE `id` = ? AND `auth` = ?";
     private static final String SQL_UPDATE_AUTH = "UPDATE `user` SET `modified_at` = ?, `auth` = ? WHERE `id` = ?";
 
@@ -162,18 +162,20 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
      * @see wup.data.access.UserDao#authenticate(java.lang.String, java.lang.String)
      */
     @Override
-    public DaoResult<Boolean> authenticate(String email, String auth) {
+    public DaoResult<User> authenticate(String email, String auth) {
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_AUTH_USER)) {
             stmt.setString(1, email);
             stmt.setString(2, hashAuth(auth));
 
             try (ResultSet result = stmt.executeQuery()) {
+                User authenticatedUser = null;
+
                 if (result.next()) {
-                    return DaoResult.succeed(DaoResult.Action.READ, true);
-                } else {
-                    return DaoResult.succeed(DaoResult.Action.READ, false);
+                    authenticatedUser = getUserFromResultSet(result);
                 }
+
+                return DaoResult.succeed(DaoResult.Action.READ, authenticatedUser);
             }
         } catch (Exception e) {
             return DaoResult.fail(DaoResult.Action.READ, e);

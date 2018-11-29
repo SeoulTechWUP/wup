@@ -54,7 +54,7 @@ public interface UserDao {
      * @param email 사용자 이메일 주소
      * @param auth  암호
      */
-    public DaoResult<Boolean> authenticate(String email, String auth);
+    public DaoResult<User> authenticate(String email, String auth);
 
     /**
      * 주어진 id에 해당하는 사용자의 암호를 변경합니다.

@@ -1,4 +1,4 @@
-package wup.servlet;
+package wup.servlet.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;

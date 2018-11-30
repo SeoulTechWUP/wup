@@ -2,7 +2,6 @@ package wup.servlet.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +16,7 @@ import wup.data.access.DaoFactory;
 import wup.data.access.DaoResult;
 import wup.data.access.MariaDbDaoFactory;
 import wup.data.access.UserDao;
+import wup.servlet.ServletHelper;
 
 /**
  * Servlet implementation class UserAuthServlet
@@ -63,15 +63,7 @@ public class UserAuthServlet extends HttpServlet {
                 out.println(GsonHolder.getGson().toJson(authenticatedUser));
             }
         } else {
-            Exception e = authResult.getException();
-
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-            if (e instanceof SQLException) {
-                out.println(new Error(Error.E_DBERROR).toJson());
-            } else {
-                out.println(new Error(-1));
-            }
+            ServletHelper.onDaoError(response, authResult);
         }
     }
 

@@ -2,7 +2,6 @@ package wup.servlet.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +18,7 @@ import wup.data.access.DaoFactory;
 import wup.data.access.DaoResult;
 import wup.data.access.MariaDbDaoFactory;
 import wup.data.access.UserDao;
+import wup.servlet.ServletHelper;
 
 /**
  * Servlet implementation class UserServlet
@@ -36,9 +36,13 @@ public class UserServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/plain; charset=UTF-8");
 
-        PrintWriter out = response.getWriter();
+        User authenticatedUser = ServletHelper.checkAuth(request, response);
 
-        Object authenticatedUser = request.getSession().getAttribute("authenticatedUser");
+        if (authenticatedUser == null) {
+            return;
+        }
+
+        PrintWriter out = response.getWriter();
 
         if (!(authenticatedUser instanceof User)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -53,21 +57,13 @@ public class UserServlet extends HttpServlet {
         UserDao userDao = (UserDao) daoFactory.getDao(User.class);
 
         if (pathInfo == null || pathInfo.isEmpty()) {
-            DaoResult<User> getUserResult = userDao.getUser(((User) authenticatedUser).getId());
+            DaoResult<User> getUserResult = userDao.getUser(authenticatedUser.getId());
 
             if (getUserResult.didSucceed()) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.println(gson.toJson(getUserResult.getData()));
             } else {
-                Exception e = getUserResult.getException();
-
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-                if (e instanceof SQLException) {
-                    out.println(new Error(Error.E_DBERROR).toJson());
-                } else {
-                    out.println(new Error(-1).toJson());
-                }
+                ServletHelper.onDaoError(response, getUserResult);
             }
 
             return;
@@ -91,15 +87,7 @@ public class UserServlet extends HttpServlet {
                         out.println(gson.toJson(getUserResult.getData()));
                     }
                 } else {
-                    Exception e = getUserResult.getException();
-
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-                    if (e instanceof SQLException) {
-                        out.println(new Error(Error.E_DBERROR).toJson());
-                    } else {
-                        out.println(new Error(-1).toJson());
-                    }
+                    ServletHelper.onDaoError(response, getUserResult);
                 }
 
                 return;

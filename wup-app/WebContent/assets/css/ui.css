@@ -32,13 +32,13 @@
 }
 
 .app div.error-message {
-  margin-bottom: 0.25rem;
+  padding: 3px;
   font-size: 0.8em;
   color: #a31c00;
 }
 
 .app div.form-item {
-  margin-bottom: 0.25rem;
+  padding: 3px;
   transition: height 0.3s, margin-bottom 0.3s, opacity 0.3s ease-out;
 }
 
@@ -272,7 +272,7 @@
 }
 
 .app .modal > .contents {
-  padding: 0.5rem;
+  padding: 3px;
 }
 
 .app .modal-container {

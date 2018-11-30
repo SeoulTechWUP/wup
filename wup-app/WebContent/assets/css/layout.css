@@ -1,0 +1,572 @@
+html {
+  height: 100vh;
+  font-size: 12pt;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', 'NanumGothic', 'Malgun Gothic', sans-serif;
+  background: url('../images/bg_noise.png') repeat, linear-gradient(to bottom, #17191b, #31363b);
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app > header {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  color: silver;
+  background: linear-gradient(to bottom, black, transparent);
+  font-weight: bold;
+}
+
+.app > header div {
+  padding: 1rem 1.2rem;
+}
+
+.app > main {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-flex: 1;
+  flex: 1;
+  padding-top: 3.5rem;
+  overflow-y: auto;
+  transition: opacity 0.5s;
+}
+
+#app-title.active,
+#user-settings.active {
+  cursor: pointer;
+}
+
+#app-title.active > span::after {
+  content: ' (Close Planner)';
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#app-title.active:hover > span::after {
+  opacity: 0.75;
+}
+
+#app-title.active > span > span.icon {
+  transform: translateY(1.5px);
+}
+
+/****************/
+/* SIGN-IN FORM */
+/****************/
+
+#signin-form {
+  width: 20rem;
+}
+
+#signin-form input,
+#signin-form button {
+  width: 100%;
+}
+
+/****************/
+/* PLANNER LIST */
+/****************/
+
+#planner-list {
+  width: 700px;
+  height: 100%;
+}
+
+#planner-list header h1 {
+  color: silver;
+  font-weight: bold;
+}
+
+#planner-list .list {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+#planner-list .list .item,
+#planner-list .list .add-new {
+  display: inline-block;
+  margin: 5px;
+  box-sizing: border-box;
+  width: 165px;
+  height: 140px;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+#planner-list .list .item {
+  padding: 1rem 0.75rem 0.5rem 0.75rem;
+  background-color: whitesmoke;
+  color: #333;
+  font-weight: bold;
+  box-shadow: 0 0 0 transparent;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#planner-list .list .item:nth-child(5n+1) {
+  background-image: linear-gradient(to bottom, #f80 -25%, transparent 25%);
+}
+
+#planner-list .list .item:nth-child(5n+2) {
+  background-image: linear-gradient(to bottom, #cf0 -25%, transparent 25%);
+}
+
+#planner-list .list .item:nth-child(5n+3) {
+  background-image: linear-gradient(to bottom, #0f8 -25%, transparent 25%);
+}
+
+#planner-list .list .item:nth-child(5n+4) {
+  background-image: linear-gradient(to bottom, #08f -25%, transparent 25%);
+}
+
+#planner-list .list .item:nth-child(5n) {
+  background-image: linear-gradient(to bottom, #c0f -25%, transparent 25%);
+}
+
+#planner-list .list .item:hover {
+  transform: translate(0, -3px);
+  box-shadow: 0 3px 20px black;
+}
+
+#planner-list .list .item:active {
+  transform: translate(0, 0);
+  box-shadow: 0 1px 5px black;
+}
+
+#planner-list .list .add-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: transparent;
+  color: gray;
+  border: 2px dashed gray;
+  transition: background-color 0.3s;
+}
+
+#planner-list .list .add-new:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#planner-list .list .add-new:active {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/****************/
+/* PLANNER VIEW */
+/****************/
+
+#planner-view {
+  position: relative;
+  box-sizing: border-box;
+  width: calc(90%);
+  height: calc(100% - 2rem);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  background-color: gray;
+  box-shadow: inset -1px -1px 1px rgba(0, 0, 0, 0.5);
+}
+
+#planner-view .border {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem;
+  border: 1px dashed rgba(0, 0, 0, 0.5);
+  border-radius: 0.5rem;
+}
+
+#planner-view .border > div {
+  -webkit-flex: 1;
+  flex: 1;
+  position: relative;
+  min-width: calc(50% - 1rem);
+  max-width: calc(50% - 1rem);
+}
+
+#planner-view .border .left {
+  margin-left: 1rem;
+}
+
+#planner-view .border .right {
+  margin-right: 1rem;
+}
+
+#planner-view .border .paper {
+  background-color: whitesmoke;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), 0 3px 20px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
+#planner-view .border .paper header h1,
+#planner-view .border .paper header h2,
+#planner-view .border .paper header h3 {
+  margin: 0.5rem 0;
+}
+
+#planner-view .border .paper .main {
+  overflow-y: auto;
+}
+
+#planner-view .left .paper {
+  padding: 1rem 2.5rem 1rem 1rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+  background-image: linear-gradient(
+    to left, gray, silver 3%, transparent 8%);
+}
+
+#planner-view .right .paper {
+  padding: 1rem 1rem 1rem 2.5rem;
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  background-image: linear-gradient(
+    to right, gray, silver 3%, transparent 8%);
+}
+
+#planner-view .contents {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  height: 100%;
+}
+
+#planner-view .contents > header {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0.25rem;
+  height: 5rem;
+}
+
+#planner-view .contents > div {
+  -webkit-flex: 1;
+  flex: 1;
+  padding: 0.25rem;
+}
+
+#planner-view .contents table.calendar {
+  box-sizing: border-box;
+  width: 100%;
+  height: 99%;
+  border-collapse: collapse;
+}
+
+#planner-view .contents table.calendar th,
+#planner-view .contents table.calendar td {
+  box-sizing: border-box;
+  width: 25%;
+}
+
+#planner-view .contents table.calendar th {
+  height: 2.25rem;
+  color: white;
+  background-color: gray;
+  border: 1px solid white;
+}
+
+#planner-view .contents table.calendar tbody {
+  height: calc(100% - 2.25rem);
+}
+
+#planner-view .contents table.calendar td {
+  position: relative;
+  border: 1px solid silver;
+}
+
+#planner-view .right .contents table.calendar tr th:last-child,
+#planner-view .right .contents table.calendar tr td:last-child {
+  visibility: hidden;
+  pointer-events: none;
+  border: none;
+  background: none;
+}
+
+#planner-view .contents table.calendar td > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.25rem;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+#planner-view .mode-tabs {
+  position: absolute;
+  top: 2rem;
+  right: 0.2rem;
+}
+
+#planner-view .mode-tabs .tab {
+  display: block;
+  position: relative;
+  margin-bottom: 0.5em;
+  box-sizing: border-box;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  cursor: pointer;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.125);
+}
+
+#planner-view .mode-tabs .tab img {
+  vertical-align: middle;
+}
+
+#planner-view .mode-tabs .tab.active {
+  z-index: 10000;
+}
+
+/****************/
+/* DATE SPINNER */
+/****************/
+
+#planner-date-spinner {
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: #333;
+}
+
+#planner-date-spinner .spin-btn {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+#planner-date-spinner .date-display {
+  -webkit-flex: 1;
+  flex: 1;
+  text-align: center;
+}
+
+#planner-date-spinner .date-display .big {
+  font-weight: bold;
+  font-size: 2.5em;
+}
+
+#planner-date-spinner .date-display .detail {
+  margin-left: 0.5em;
+}
+
+/**********************/
+/* SCHEDULE LIST ITEM */
+/**********************/
+
+#planner-view .schedule-list-item {
+  display: block;
+  margin: 1px 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1px;
+  background-color: #eee;
+  border: 1px solid silver;
+  border-radius: 3px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+#planner-view .schedule-list-item .labels {
+  display: inline-block;
+}
+
+#planner-view .schedule-list-item .labels div.label {
+  display: inline-block;
+  border-radius: 1px;
+  width: 3px;
+  height: 1em;
+  margin: 0 1px;
+  transform: translate(0, 1px);
+}
+
+/********************/
+/* SCHEDULE DETAILS */
+/********************/
+
+#schedule-details {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  background-color: whitesmoke;
+}
+
+#schedule-details form {
+  width: 100%;
+  height: 100%;
+}
+
+#schedule-details table {
+  width: 100%;
+  height: 100%;
+}
+
+#schedule-details table tbody {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+#schedule-details table tr {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+#schedule-details table th {
+  box-sizing: border-box;
+  padding: 0.25em;
+  width: 100px;
+  text-align: right;
+}
+
+#schedule-details table td {
+  -webkit-flex: 1;
+  flex: 1;
+  padding: 0.25em;
+}
+
+#schedule-details table tr.fill {
+  -webkit-flex: 1;
+  flex: 1;
+}
+
+#schedule-details table tr.fill th,
+#schedule-details table tr.fill td {
+  height: 100%;
+}
+
+#schedule-details table input[type=text] {
+  width: 100%;
+}
+
+#schedule-details table textarea {
+  width: 100%;
+  height: 100%;
+}
+
+/***************/
+/* TO-DO LISTS */
+/***************/
+
+#planner-view table.todo-list {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+#planner-view table.todo-list tbody tr {
+  cursor: pointer;
+}
+
+#planner-view table.todo-list tr:hover {
+  background-color: rgba(0, 0, 0, 0.0625);
+}
+
+#planner-view table.todo-list th {
+  box-sizing: border-box;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  background: gray;
+  color: white;
+}
+
+#planner-view table.todo-list td {
+  box-sizing: border-box;
+  padding: 0.5rem 0.5rem;
+  border-bottom: 1px solid silver;
+}
+
+#planner-view table.todo-list tr.selected td {
+  background-color: #ffffc0;
+}
+
+#planner-view table.todo-list tr.complete td.col-title {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+#planner-view table.todo-list td.col-complete,
+#planner-view table.todo-list th.col-complete,
+#planner-view table.todo-list td.col-delete,
+#planner-view table.todo-list th.col-delete {
+  width: 2rem;
+  text-align: center;
+}
+
+#planner-view table.todo-list td.col-complete input[type=checkbox] {
+  display: inline;
+}
+
+#planner-view table.todo-list td.col-delete button {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: none;
+  background: white url('/assets/images/icon_todo_delete.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#planner-view table.todo-list .new-list,
+#planner-view table.todo-list .new-item {
+  display: flex;
+}
+
+#planner-view table.todo-list .new-list input[type=text],
+#planner-view table.todo-list .new-item input[type=text] {
+  -webkit-flex: 1;
+  flex: 1;
+  margin-right: 5px;
+}
+
+#todo-details-placeholder .main {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+#todo-details-placeholder .main > div {
+  font-size: 1.2em;
+  text-align: center;
+  opacity: 0.5;
+}

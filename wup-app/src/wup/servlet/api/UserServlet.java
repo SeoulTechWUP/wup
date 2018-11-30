@@ -2,12 +2,23 @@ package wup.servlet.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.Gson;
+
+import wup.api.Error;
+import wup.api.GsonHolder;
+import wup.data.User;
+import wup.data.access.DaoFactory;
+import wup.data.access.DaoResult;
+import wup.data.access.MariaDbDaoFactory;
+import wup.data.access.UserDao;
 
 /**
  * Servlet implementation class UserServlet
@@ -25,11 +36,39 @@ public class UserServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/plain; charset=UTF-8");
 
-        String pathInfo = request.getPathInfo();
         PrintWriter out = response.getWriter();
 
+        Object authenticatedUser = request.getSession().getAttribute("authenticatedUser");
+
+        if (!(authenticatedUser instanceof User)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.println(new Error(Error.E_NOAUTH).toJson());
+
+            return;
+        }
+
+        String pathInfo = request.getPathInfo();
+        Gson gson = GsonHolder.getGson();
+        MariaDbDaoFactory daoFactory = new DaoFactory();
+        UserDao userDao = (UserDao) daoFactory.getDao(User.class);
+
         if (pathInfo == null || pathInfo.isEmpty()) {
-            out.println("현재 로그인되어 있는 사용자의 정보 표시");
+            DaoResult<User> getUserResult = userDao.getUser(((User) authenticatedUser).getId());
+
+            if (getUserResult.didSucceed()) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.println(gson.toJson(getUserResult.getData()));
+            } else {
+                Exception e = getUserResult.getException();
+
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                if (e instanceof SQLException) {
+                    out.println(new Error(Error.E_DBERROR).toJson());
+                } else {
+                    out.println(new Error(-1).toJson());
+                }
+            }
 
             return;
         }
@@ -39,18 +78,41 @@ public class UserServlet extends HttpServlet {
 
             try {
                 int userId = Integer.parseInt(pathInfo);
+                DaoResult<User> getUserResult = userDao.getUser(userId);
 
-                out.println("일련번호가 " + userId + "인 사용자의 정보 표시");
+                if (getUserResult.didSucceed()) {
+                    User retrievedUser = getUserResult.getData();
+
+                    if (retrievedUser == null) {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        out.println(new Error(Error.E_NOENT).toJson());
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.println(gson.toJson(getUserResult.getData()));
+                    }
+                } else {
+                    Exception e = getUserResult.getException();
+
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                    if (e instanceof SQLException) {
+                        out.println(new Error(Error.E_DBERROR).toJson());
+                    } else {
+                        out.println(new Error(-1).toJson());
+                    }
+                }
 
                 return;
             } catch (NumberFormatException e) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.println(new Error(Error.E_NOENT).toJson());
 
                 return;
             }
         }
 
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        out.println(new Error(Error.E_NOENT).toJson());
 
         return;
     }

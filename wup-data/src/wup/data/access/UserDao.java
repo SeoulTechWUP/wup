@@ -19,6 +19,13 @@ public interface UserDao {
     public DaoResult<User> getUser(int id);
 
     /**
+     * 주어진 이메일 주소로 등록한 사용자를 가져옵니다.
+     *
+     * @param email 등록 시 사용한 이메일 주소
+     */
+    public DaoResult<User> getUser(String email);
+
+    /**
      * 주어진 <code>group</code>의 모든 구성원의 리스트를 가져옵니다.
      *
      * @param group 구성원을 조회할 그룹

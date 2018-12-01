@@ -28,6 +28,7 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
 
     private static final String TABLE_NAME = "user";
 
+    private static final String SQL_GET_BY_EMAIL = "SELECT * FROM `user` WHERE `email` = ?";
     private static final String SQL_GET_MEMBERS = "SELECT u.* FROM `user` u INNER JOIN `membership` m ON u.`id` = m.`user_id` WHERE m.`group_id` = ?";
     private static final String SQL_PARAM_NAMES = "(`created_at`, `modified_at`, `email`, `auth`, `full_name`, `nickname`, `verified`, `avatar`)";
     private static final String SQL_PARAM_VALUES = "(?, ?, ?, ?, ?, ?, ?, ?)";
@@ -56,6 +57,31 @@ public class MariaDbUserDao extends MariaDbDao implements UserDao {
 
             return DaoResult.succeed(DaoResult.Action.READ, user);
         });
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see wup.data.access.UserDao#getUser(java.lang.String)
+     */
+    @Override
+    public DaoResult<User> getUser(String email) {
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_GET_BY_EMAIL)) {
+            stmt.setString(1, email);
+
+            try (ResultSet result = stmt.executeQuery()) {
+                User user = null;
+
+                if (result.next()) {
+                    user = getUserFromResultSet(result);
+                }
+
+                return DaoResult.succeed(DaoResult.Action.READ, user);
+            }
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.READ, e);
+        }
     }
 
     /*

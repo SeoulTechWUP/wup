@@ -33,17 +33,8 @@ public class LoginServlet extends HttpServlet {
         MariaDbDaoFactory daoFactory = new DaoFactory();
         UserDao userDao = (UserDao) daoFactory.getDao(User.class);
 
-        String email = request.getParameter("email");
-        String auth = request.getParameter("password");
-
-        if (email == null) {
-            email = "";
-        }
-
-        if (auth == null) {
-            auth = "";
-        }
-
+        String email = ServletHelper.trimString(request.getParameter("email"));
+        String auth = ServletHelper.trimString(request.getParameter("password"));
         DaoResult<User> authResult = userDao.authenticate(email, auth);
         HttpSession session = request.getSession();
         String contextPath = request.getContextPath();

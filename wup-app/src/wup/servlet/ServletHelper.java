@@ -42,4 +42,12 @@ public class ServletHelper {
             out.println(new Error(-1).toJson());
         }
     }
+
+    public static String trimString(String string) {
+        if (string == null) {
+            return "";
+        }
+
+        return string.trim();
+    }
 }

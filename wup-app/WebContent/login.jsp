@@ -49,7 +49,7 @@ if (session.getAttribute("authenticatedUser") != null) {
                                         <input type="submit" value="로그인" class="tinted">
                                     </div>
                                 </form>
-                                <form method="post" style="display: none">
+                                <form method="post" action="<c:url value="/processJoin" />" style="display: none">
                                     <div class="form-item">
                                         <input type="text" name="email" placeholder="이메일 주소">
                                     </div>

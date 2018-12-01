@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ page import="wup.data.User" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="wup" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="authenticatedUser" class="wup.data.User" scope="session" />
 <c:if test="${authenticatedUser.email == null}">
     <% response.sendRedirect(request.getContextPath() + "/login.jsp"); %>
@@ -12,21 +13,12 @@
 <head>
     <meta charset="UTF-8">
     <title>WUP</title>
-    <script src="<c:url value="/assets/js/ui.js" />"></script>
-    <link rel="stylesheet" href="<c:url value="/assets/css/ui.css" />">
-    <link rel="stylesheet" href="<c:url value="/assets/css/layout.css" />">
+    <wup:includeAssets />
 </head>
 
 <body>
     <div id="app-main" class="app">
-        <header>
-            <div id="app-title">
-                <span>WUP &mdash; What's Your Plan?</span>
-            </div>
-            <div>
-                <span id="user-settings">${authenticatedUser.fullName}</span>
-            </div>
-        </header>
+        <wup:appHeader />
         <main>
             <div id="planner-list">
                 <header>

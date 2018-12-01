@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="wup" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="authenticatedUser" class="wup.data.User" scope="session" />
 <c:if test="${authenticatedUser.email != null}">
     <% response.sendRedirect(request.getContextPath()); %>
@@ -10,20 +11,11 @@
     <head>
         <meta charset="UTF-8">
         <title>로그인 | WUP</title>
-        <script src="<c:url value="/assets/js/ui.js" />"></script>
-        <link rel="stylesheet" href="<c:url value="/assets/css/ui.css" />">
-        <link rel="stylesheet" href="<c:url value="/assets/css/layout.css" />">
+        <wup:includeAssets />
     </head>
     <body>
         <div id="app-main" class="app">
-            <header>
-                <div id="app-title">
-                    <span>WUP &mdash; What's Your Plan?</span>
-                </div>
-                <div>
-                    <span id="user-settings">로그인 해주세요</span>
-                </div>
-            </header>
+            <wup:appHeader />
             <main>
                 <div class="modal-container">
                     <div class="contents">

@@ -12,17 +12,23 @@ class TopTabs {
         for (var i = 0; i < this.tabs.length; i++) {
             (function (index) {
                 that.tabs[index].onclick = function (e) {
-                    that.currentTab = index;
-                    if (that.tabChanged) {
-                        that.tabChanged.call(that, that.currentTab);
-                    }
-                    that.updateUI();
+                    that.setTab(index);
                 };
             })(i);
         }
 
         /** @type {(tabIndex: number) => void} */
         this.tabChanged = null;
+    }
+
+    setTab(index) {
+        this.currentTab = index;
+
+        if (this.tabChanged) {
+            this.tabChanged.call(this, this.currentTab);
+        }
+
+        this.updateUI();
     }
 
     updateUI() {

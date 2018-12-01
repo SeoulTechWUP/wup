@@ -44,14 +44,14 @@ public class LoginServlet extends HttpServlet {
 
             if (authenticatedUser == null) {
                 session.setAttribute("loginErrorMessage", Error.messages.get(Error.E_LOGINFAIL));
-                response.sendRedirect(contextPath + "/login.jsp");
+                response.sendRedirect(contextPath + "/login.jsp#login");
             } else {
                 session.setAttribute("authenticatedUser", authenticatedUser);
                 response.sendRedirect(contextPath);
             }
         } else {
             session.setAttribute("loginErrorMessage", Error.messages.get(Error.E_DBERROR));
-            response.sendRedirect(contextPath + "/login.jsp");
+            response.sendRedirect(contextPath + "/login.jsp#login");
         }
     }
 

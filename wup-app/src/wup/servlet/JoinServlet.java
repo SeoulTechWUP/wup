@@ -88,7 +88,7 @@ public class JoinServlet extends HttpServlet {
     private void showError(HttpServletRequest request, HttpServletResponse response, String message)
             throws IOException {
         request.getSession().setAttribute("loginErrorMessage", message);
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/login.jsp#join");
     }
 
 }

@@ -82,6 +82,7 @@ if (session.getAttribute("authenticatedUser") != null) {
             let tabControl = new TopTabs(tabContainer);
             let forms = document.forms;
             let errMsg = document.getElementById("error-message");
+            var loaded = false;
 
             tabControl.tabChanged = i => {
                 for (var form of forms) {
@@ -89,13 +90,15 @@ if (session.getAttribute("authenticatedUser") != null) {
                 }
 
                 forms[i].style.display = "block";
-                if (errMsg) {
+
+                if (errMsg && loaded) {
                     errMsg.style.display = "none";
                 }
             };
 
-            let loginForm = forms[0];
-            let joinForm = forms[1];
+            tabControl.setTab(location.hash === "#join" ? 1 : 0);
+
+            loaded = true;
         })();
         </script>
     </body>

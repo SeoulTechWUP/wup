@@ -1,11 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-if (session.getAttribute("authenticatedUser") != null) {
-    response.sendRedirect(request.getContextPath());
-}
-%>
+<jsp:useBean id="authenticatedUser" class="wup.data.User" scope="session" />
+<c:if test="${authenticatedUser.email != null}">
+    <% response.sendRedirect(request.getContextPath()); %>
+</c:if>
 <!DOCTYPE html>
 <html>
     <head>

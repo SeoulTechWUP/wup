@@ -24,6 +24,7 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
     private static final String TABLE_NAME = "group";
 
     private static final String SQL_GET_BY_USER = "SELECT `g`.* FROM `group` `g` INNER JOIN `membership` `m` ON `g`.`id` = `m`.`group_id` WHERE `m`.`user_id` = ?";
+    private static final String SQL_CHECK_MEMBERSHIP = "SELECT * FROM `membership` WHERE `group_id` = ? AND `user_id` = ?";
     private static final String SQL_INSERT = "INSERT INTO `group` (`created_at`, `modified_at`, `owner`, `name`) VALUES (?, ?, ?, ?)";
     private static final String SQL_ADD_MEMBER = "INSERT INTO `membership` (`created_at`, `modified_at`, `user_id`, `group_id`) VALUES (?, ?, ?, ?)";
     private static final String SQL_REMOVE_MEMBER = "DELETE FROM `membership` WHERE `user_id` = ? AND `group_id` = ?";
@@ -73,6 +74,26 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
                 }
 
                 return DaoResult.succeed(DaoResult.Action.READ, groups);
+            }
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.READ, e);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see wup.data.access.GroupDao#isMember(wup.data.Group, wup.data.User)
+     */
+    @Override
+    public DaoResult<Boolean> isMember(Group group, User user) {
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_MEMBERSHIP)) {
+            stmt.setInt(0, group.getId());
+            stmt.setInt(1, user.getId());
+
+            try (ResultSet result = stmt.executeQuery()) {
+                return DaoResult.succeed(DaoResult.Action.READ, result.next());
             }
         } catch (Exception e) {
             return DaoResult.fail(DaoResult.Action.READ, e);

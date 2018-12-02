@@ -26,6 +26,14 @@ public interface GroupDao {
     public DaoResult<List<Group>> getGroups(User user);
 
     /**
+     * 주어진 <code>user</code>가 <code>group</code>에 소속되어 있는지 여부를 가져옵니다.
+     *
+     * @param group 소속 여부를 확인할 그룹
+     * @param user  소속 여부를 확인할 사용자
+     */
+    public DaoResult<Boolean> isMember(Group group, User user);
+
+    /**
      * 주어진 <code>user</code>가 소유하게 될 새로운 사용자 그룹을 생성합니다.
      *
      * @param user  새로운 사용자 그룹의 소유자

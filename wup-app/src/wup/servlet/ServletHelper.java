@@ -20,11 +20,13 @@ public class ServletHelper {
     public static User checkAuth(HttpServletRequest request, HttpServletResponse response) throws IOException {
         User authenticatedUser = (User) request.getSession().getAttribute("authenticatedUser");
 
-        if (authenticatedUser == null) {
+        if (authenticatedUser == null || authenticatedUser.getEmail() == null) {
             PrintWriter out = response.getWriter();
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.println(new Error(Error.E_NOAUTH).toJson());
+
+            return null;
         }
 
         return authenticatedUser;

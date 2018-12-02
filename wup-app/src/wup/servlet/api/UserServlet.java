@@ -43,14 +43,6 @@ public class UserServlet extends HttpServlet {
         }
 
         PrintWriter out = response.getWriter();
-
-        if (!(authenticatedUser instanceof User)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.println(new Error(Error.E_NOAUTH).toJson());
-
-            return;
-        }
-
         String pathInfo = request.getPathInfo();
         Gson gson = GsonHolder.getGson();
         MariaDbDaoFactory daoFactory = new DaoFactory();

@@ -17,7 +17,7 @@
                     let userSettingsMenu = new DropdownMenu("사용자 설정", "로그아웃");
 
                     userSettingsMenu.itemClicked(1, e => {
-                        alert("bye");
+                        location.href = `<c:url value="/processLogout" />`;
                     });
 
                     document.getElementById("user-settings").addEventListener("click", e => {

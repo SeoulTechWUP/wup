@@ -26,14 +26,22 @@
 				<td>제목</td>
 				<td>작성자</td>
 			</tr>
-			
-			<c:forEach items="${postlist}" var="post">
+			<c:choose>
+				<c:when test="${postlist.size() eq '0'}">
 				<tr>
-					<td><fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd"/></td>
-					<td>${post.title}</td>
-					<td>${post.owner.getNickname()}</td>
+					<td colspan="3"><p>게시물이 없습니다.</p></td>
 				</tr>
-			</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<c:forEach items="${postlist}" var="post">
+						<tr>
+							<td><fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd"/></td>
+							<td>${post.title}</td>
+							<td>${post.owner.getNickname()}</td>
+						</tr>
+					</c:forEach>
+				</c:otherwise>
+			</c:choose>
 		</table>
 	</div>
 </body>

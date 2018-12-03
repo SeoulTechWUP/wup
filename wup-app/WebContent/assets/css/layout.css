@@ -122,23 +122,23 @@ body {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-#planner-list .list .item:nth-child(5n+1) {
+#planner-list .list a:nth-child(5n+1) .item {
   background-image: linear-gradient(to bottom, #f80 -25%, transparent 25%);
 }
 
-#planner-list .list .item:nth-child(5n+2) {
+#planner-list .list a:nth-child(5n+2) .item {
   background-image: linear-gradient(to bottom, #cf0 -25%, transparent 25%);
 }
 
-#planner-list .list .item:nth-child(5n+3) {
+#planner-list .list a:nth-child(5n+3) .item {
   background-image: linear-gradient(to bottom, #0f8 -25%, transparent 25%);
 }
 
-#planner-list .list .item:nth-child(5n+4) {
+#planner-list .list a:nth-child(5n+4) .item {
   background-image: linear-gradient(to bottom, #08f -25%, transparent 25%);
 }
 
-#planner-list .list .item:nth-child(5n) {
+#planner-list .list a:nth-child(5n) .item {
   background-image: linear-gradient(to bottom, #c0f -25%, transparent 25%);
 }
 

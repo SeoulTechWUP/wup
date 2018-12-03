@@ -101,7 +101,28 @@ class DropdownMenu {
 }
 
 window.addEventListener("load", e => {
+    let modalContainer = document.getElementById("modal-container");
+    let modalFader = modalContainer.getElementsByClassName("fader")[0];
+    let modalContentsArea = modalContainer.getElementsByClassName("contents")[0];
     let dropdownContainer = document.getElementById("dropdown-container");
+
+    window.modalManager = {
+        start: modalObj => {
+            modalContainer.style.display = "block";
+
+            setTimeout(() => {
+                modalFader.style.opacity = "1";
+                modalContentsArea.appendChild(modalObj.element);
+            }, 10);
+        },
+        end: function () {
+            modalContentsArea.innerHTML = '';
+            modalFader.style.opacity = '0';
+            setTimeout(function () {
+                modalContainer.style.display = 'none';
+            }, 550);
+        }
+    };
 
     window.dropdownManager = {
         show: function (x, y, menu) {

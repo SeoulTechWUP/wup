@@ -20,6 +20,9 @@
                     <h1>그룹 플래너<a class="switch-category" href="<c:url value="/planners" />">개인</a><a class="switch-category" href="<c:url value="/board" />">공개</a></h1>
                 </header>
                 <div class="list">
+                    <c:forEach items="${requestScope.groups}" var="group">
+                        <a href="<c:url value="/group/${group.id}" />"><div class="item">${group.name}</div></a>
+                    </c:forEach>
                     <div id="add-new-button" class="add-new">
                         <div>
                             <img src="<c:url value="/assets/images/icon_addplanner.svg" />"><br>

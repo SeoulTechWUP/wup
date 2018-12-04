@@ -62,13 +62,29 @@
         let addNewButton = document.getElementById("add-new-button");
         let modalElement = document.getElementById("modal-new-planner");
         let modalForm = modalElement.getElementsByTagName("form")[0];
+        let errorMessage = modalElement.getElementsByClassName("error-message")[0];
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.onload = e => {
+            let data = JSON.parse(e.target.responseText);
+
+            if (data.error) {
+                errorMessage.innerHTML = data.error.message;
+            } else {
+                location.reload();
+            }
+        }
 
         modalForm.cancel.addEventListener("click", e => {
             modalManager.end();
         }, false);
 
         modalForm.addEventListener("submit", e => {
-            alert("submit");
+            xhr.open("post", `<c:url value="/planner" />`, true);
+            xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+            xhr.send(`title=\${encodeURIComponent(modalForm.title.value)}`);
+
             e.preventDefault();
         }, false);
 

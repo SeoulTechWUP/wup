@@ -89,8 +89,8 @@ public class MariaDbGroupDao extends MariaDbDao implements GroupDao {
     public DaoResult<Boolean> isMember(Group group, User user) {
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_MEMBERSHIP)) {
-            stmt.setInt(0, group.getId());
-            stmt.setInt(1, user.getId());
+            stmt.setInt(1, group.getId());
+            stmt.setInt(2, user.getId());
 
             try (ResultSet result = stmt.executeQuery()) {
                 return DaoResult.succeed(DaoResult.Action.READ, result.next());

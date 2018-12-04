@@ -23,7 +23,7 @@
                     <c:forEach items="${requestScope.planners}" var="planner">
                         <a href="<c:url value="/planner/${planner.id}" />"><div class="item">${planner.title}</div></a>
                     </c:forEach>
-                    <div class="add-new">
+                    <div id="add-new-button" class="add-new">
                         <div>
                             <img src="<c:url value="/assets/images/icon_addplanner.svg" />"><br>
                             새로 만들기
@@ -37,7 +37,46 @@
             <div class="fader" style="opacity: 0"></div>
             <div class="contents"></div>
         </div>
+        <div id="ui-templates" style="display: none">
+            <div id="modal-new-planner" class="modal">
+                <div class="top-tabs">
+                    <div class="tab active">새 플래너 만들기</div>
+                </div>
+                <div class="contents">
+                    <form>
+                        <div class="error-message"></div>
+                        <div class="form-item">
+                            <input name="title" type="text" placeholder="제목 (필수 사항)" size="40" required>
+                        </div>
+                        <div class="form-item" style="text-align: right">
+                            <button name="cancel" type="button">취소</button>
+                            <input name="submit" class="tinted" type="submit" value="만들기">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+    <script>
+    (function () {
+        let addNewButton = document.getElementById("add-new-button");
+        let modalElement = document.getElementById("modal-new-planner");
+        let modalForm = modalElement.getElementsByTagName("form")[0];
+
+        modalForm.cancel.addEventListener("click", e => {
+            modalManager.end();
+        }, false);
+
+        modalForm.addEventListener("submit", e => {
+            alert("submit");
+            e.preventDefault();
+        }, false);
+
+        addNewButton.addEventListener("click", e => {
+            modalManager.start({element: modalElement});
+        }, false);
+    })();
+    </script>
 </body>
 
 </html>

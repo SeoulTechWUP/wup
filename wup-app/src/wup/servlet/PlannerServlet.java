@@ -1,7 +1,6 @@
-package wup.servlet.api;
+package wup.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,28 +21,13 @@ import wup.data.access.DaoResult;
 import wup.data.access.GroupDao;
 import wup.data.access.MariaDbDaoFactory;
 import wup.data.access.PlannerDao;
-import wup.servlet.ServletHelper;
 
 /**
  * Servlet implementation class PlannerServlet
  */
-@WebServlet("/api/planner/*")
+@WebServlet("/planner/*")
 public class PlannerServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
-    @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("application/json; charset=utf-8");
-
-        User authenticatedUser = ServletHelper.checkAuth(request, response);
-
-        if (authenticatedUser == null) {
-            return;
-        }
-
-        super.service(request, response);
-    }
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -53,17 +37,28 @@ public class PlannerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         User authenticatedUser = (User) request.getSession().getAttribute("authenticatedUser");
-        Planner planner = requirePlanner(request, response, authenticatedUser);
 
-        if (planner == null) {
+        if (authenticatedUser == null || authenticatedUser.getEmail() == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+
             return;
         }
 
-        PrintWriter out = response.getWriter();
-        Gson gson = GsonHolder.getGson();
+        RequirePlannerResult rp = requirePlanner(request, response, authenticatedUser);
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        out.println(gson.toJson(planner));
+        if (rp.exception != null) {
+            throw new ServletException(rp.exception);
+        } else if (rp.errorCode > 0) {
+            response.sendError(rp.errorCode);
+
+            return;
+        }
+
+        Planner planner = rp.planner;
+
+        request.setAttribute("planner", planner);
+        // request.getRequestDispatcher(request.getContextPath() + "/planner.jsp");
+        response.getWriter().println(GsonHolder.getGson().toJson(planner));
     }
 
     /**
@@ -73,8 +68,35 @@ public class PlannerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        doGet(request, response);
+        response.setContentType("application/json; charset=utf-8");
+
+        User authenticatedUser = ServletHelper.checkAuth(request, response);
+
+        String title = ServletHelper.trimString(request.getParameter("title"));
+
+        if (title.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println(new Error(Error.E_ARGMISSING).toJson());
+
+            return;
+        }
+
+        Gson gson = GsonHolder.getGson();
+        MariaDbDaoFactory daoFactory = new DaoFactory();
+        PlannerDao plannerDao = (PlannerDao) daoFactory.getDao(Planner.class);
+        Planner planner = new Planner();
+
+        planner.setType(ItemOwner.Type.USER);
+        planner.setTitle(title);
+
+        DaoResult<Planner> createPlannerResult = plannerDao.createPlanner(authenticatedUser, planner);
+
+        if (!createPlannerResult.didSucceed()) {
+            ServletHelper.onDaoError(response, createPlannerResult);
+        } else {
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            response.getWriter().println(gson.toJson(createPlannerResult.getData()));
+        }
     }
 
     /**
@@ -83,12 +105,7 @@ public class PlannerServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        User authenticatedUser = (User) request.getSession().getAttribute("authenticatedUser");
-        Planner planner = requirePlanner(request, response, authenticatedUser);
-
-        if (planner == null) {
-            return;
-        }
+        User authenticatedUser = ServletHelper.checkAuth(request, response);
     }
 
     /**
@@ -97,25 +114,40 @@ public class PlannerServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        User authenticatedUser = (User) request.getSession().getAttribute("authenticatedUser");
-        Planner planner = requirePlanner(request, response, authenticatedUser);
+        User authenticatedUser = ServletHelper.checkAuth(request, response);
+    }
 
-        if (planner == null) {
-            return;
+    private static class RequirePlannerResult {
+        public final Planner planner;
+        public final int errorCode;
+        public final Exception exception;
+
+        private RequirePlannerResult(Planner planner, int errorCode, Exception exception) {
+            this.planner = planner;
+            this.errorCode = errorCode;
+            this.exception = exception;
+        }
+
+        public static RequirePlannerResult succeed(Planner planner) {
+            return new RequirePlannerResult(planner, -1, null);
+        }
+
+        public static RequirePlannerResult fail(int errorCode) {
+            return new RequirePlannerResult(null, errorCode, null);
+        }
+
+        public static RequirePlannerResult fail(Exception exception) {
+            return new RequirePlannerResult(null, -1, exception);
         }
     }
 
-    private Planner requirePlanner(HttpServletRequest request, HttpServletResponse response, User user)
+    private RequirePlannerResult requirePlanner(HttpServletRequest request, HttpServletResponse response, User user)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
-        PrintWriter out = response.getWriter();
         int plannerId = parsePlannerId(pathInfo);
 
         if (plannerId < 0) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            out.println(new Error(Error.E_NOENT).toJson());
-
-            return null;
+            return RequirePlannerResult.fail(HttpServletResponse.SC_NOT_FOUND);
         }
 
         MariaDbDaoFactory daoFactory = new DaoFactory();
@@ -123,33 +155,23 @@ public class PlannerServlet extends HttpServlet {
         DaoResult<Planner> getPlannerResult = plannerDao.getPlanner(plannerId);
 
         if (!getPlannerResult.didSucceed()) {
-            ServletHelper.onDaoError(response, getPlannerResult);
-
-            return null;
+            return RequirePlannerResult.fail(getPlannerResult.getException());
         }
 
         Planner planner = getPlannerResult.getData();
 
         if (planner == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            out.println(new Error(Error.E_NOENT).toJson());
-
-            return null;
+            return RequirePlannerResult.fail(HttpServletResponse.SC_NOT_FOUND);
         }
 
         DaoResult<Boolean> getAccessResult = hasAccess(planner, user);
 
         if (!getAccessResult.didSucceed()) {
-            ServletHelper.onDaoError(response, getAccessResult);
-
-            return null;
+            return RequirePlannerResult.fail(getAccessResult.getException());
         } else if (!getAccessResult.getData()) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            out.println(new Error(Error.E_NOACCESS).toJson());
-
-            return null;
+            return RequirePlannerResult.fail(HttpServletResponse.SC_FORBIDDEN);
         } else {
-            return planner;
+            return RequirePlannerResult.succeed(planner);
         }
     }
 

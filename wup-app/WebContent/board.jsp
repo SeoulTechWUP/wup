@@ -34,10 +34,18 @@
 				</c:when>
 				<c:otherwise>
 					<c:forEach items="${postlist}" var="post">
-						<tr>
+						<c:set var="post" value="${post}" scope="request"/>
+						<tr class="dropdown">
 							<td><fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd"/></td>
-							<td>${post.title}</td>
+							<td><a href="#" data-toggle="dropdown">${post.title}</a></td>
 							<td>${post.owner.getNickname()}</td>
+						</tr>
+						<tr class="dropdown-post">
+							<td colspan="3">
+								<jsp:include page="/PostView.jsp" flush="true">
+									<jsp:param value="${post}" name="post" />
+								</jsp:include>
+							</td>
 						</tr>
 					</c:forEach>
 				</c:otherwise>

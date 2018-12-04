@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebServlet("/PostListServlet")
+@WebServlet("/Board")
 public class PostListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class PostListServlet extends HttpServlet {
 	        throws ServletException, IOException {
 	       
 	    ServletContext app = this.getServletContext();
-	    String contextPath = request.getContextPath();
+	    String contextPath = request.getContextPath(); //redirect시에
 	    RequestDispatcher dispatcher = app.getRequestDispatcher("/board.jsp");
 	    
         MariaDbDaoFactory daoFactory = new DaoFactory();
@@ -40,6 +40,8 @@ public class PostListServlet extends HttpServlet {
             request.setAttribute("postlist", postlist);
         }
         else {
+            //error 페이지로 forwarding 해야함
+            request.setAttribute("BoardErrorMessage", getPostList.getException().getMessage());
             System.out.println(getPostList.getException().getMessage());
         }
 

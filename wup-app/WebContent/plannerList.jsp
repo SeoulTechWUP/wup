@@ -17,7 +17,7 @@
         <main>
             <div id="planner-list">
                 <header>
-                    <h1>내 플래너</h1>
+                    <h1>내 플래너<a class="switch-category" href="<c:url value="/groups" />">그룹</a><a class="switch-category" href="<c:url value="/board" />">공개</a></h1>
                 </header>
                 <div class="list">
                     <c:forEach items="${requestScope.planners}" var="planner">

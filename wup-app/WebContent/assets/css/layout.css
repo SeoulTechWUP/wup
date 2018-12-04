@@ -95,6 +95,18 @@ body {
   font-weight: bold;
 }
 
+#planner-list header h1 a.switch-category {
+  margin-left: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.5em;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+#planner-list header h1 a.switch-category:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 #planner-list .list {
   display: -webkit-flex;
   display: flex;

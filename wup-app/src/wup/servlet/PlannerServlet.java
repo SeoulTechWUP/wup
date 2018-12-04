@@ -44,7 +44,7 @@ public class PlannerServlet extends HttpServlet {
             return;
         }
 
-        RequirePlannerResult rp = requirePlanner(request, response, authenticatedUser);
+        RequirePlannerResult rp = requirePlanner(request, authenticatedUser);
 
         if (rp.exception != null) {
             throw new ServletException(rp.exception);
@@ -57,8 +57,7 @@ public class PlannerServlet extends HttpServlet {
         Planner planner = rp.planner;
 
         request.setAttribute("planner", planner);
-        // request.getRequestDispatcher(request.getContextPath() + "/planner.jsp");
-        response.getWriter().println(GsonHolder.getGson().toJson(planner));
+        request.getRequestDispatcher("/planner.jsp").forward(request, response);
     }
 
     /**
@@ -141,10 +140,9 @@ public class PlannerServlet extends HttpServlet {
         }
     }
 
-    private RequirePlannerResult requirePlanner(HttpServletRequest request, HttpServletResponse response, User user)
+    private RequirePlannerResult requirePlanner(HttpServletRequest request, User user)
             throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
-        int plannerId = parsePlannerId(pathInfo);
+        int plannerId = parsePlannerId(request.getPathInfo());
 
         if (plannerId < 0) {
             return RequirePlannerResult.fail(HttpServletResponse.SC_NOT_FOUND);

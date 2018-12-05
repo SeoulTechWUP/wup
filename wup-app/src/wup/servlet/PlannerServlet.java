@@ -1,6 +1,11 @@
 package wup.servlet;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,12 +20,14 @@ import wup.api.GsonHolder;
 import wup.data.Group;
 import wup.data.ItemOwner;
 import wup.data.Planner;
+import wup.data.Schedule;
 import wup.data.User;
 import wup.data.access.DaoFactory;
 import wup.data.access.DaoResult;
 import wup.data.access.GroupDao;
 import wup.data.access.MariaDbDaoFactory;
 import wup.data.access.PlannerDao;
+import wup.data.access.ScheduleDao;
 
 /**
  * Servlet implementation class PlannerServlet
@@ -28,6 +35,13 @@ import wup.data.access.PlannerDao;
 @WebServlet("/planner/*")
 public class PlannerServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private static final Pattern plannerRegex;
+    private static final Pattern plannerAndDateRegex;
+
+    static {
+        plannerRegex = Pattern.compile("^\\/(?<id>\\d+)$");
+        plannerAndDateRegex = Pattern.compile("^\\/(?<id>\\d+)\\/(?<year>\\d{4})\\/(?<month>\\d{1,2})$");
+    }
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -44,7 +58,41 @@ public class PlannerServlet extends HttpServlet {
             return;
         }
 
-        RequirePlannerResult rp = requirePlanner(request, authenticatedUser);
+        String pathInfo = request.getPathInfo();
+
+        if (pathInfo == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+
+            return;
+        }
+
+        Matcher plannerAndDateMatcher = plannerAndDateRegex.matcher(pathInfo);
+        Matcher plannerMatcher = plannerRegex.matcher(pathInfo);
+        int id, year, month;
+
+        try {
+            if (plannerAndDateMatcher.matches()) {
+                id = Integer.parseInt(plannerAndDateMatcher.group("id"));
+                year = Integer.parseInt(plannerAndDateMatcher.group("year"));
+                month = Integer.parseInt(plannerAndDateMatcher.group("month")) - 1;
+            } else if (plannerMatcher.matches()) {
+                GregorianCalendar now = new GregorianCalendar();
+
+                id = Integer.parseInt(plannerMatcher.group("id"));
+                year = now.get(GregorianCalendar.YEAR);
+                month = now.get(GregorianCalendar.MONTH);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+
+                return;
+            }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+
+            return;
+        }
+
+        RequirePlannerResult rp = requirePlanner(id, authenticatedUser);
 
         if (rp.exception != null) {
             throw new ServletException(rp.exception);
@@ -55,8 +103,22 @@ public class PlannerServlet extends HttpServlet {
         }
 
         Planner planner = rp.planner;
+        GregorianCalendar calendar = new GregorianCalendar(year, month, 1);
+        Date dateFrom = calendar.getTime();
+        Date dateTo = new GregorianCalendar(year, month + 1, 0).getTime();
+
+        MariaDbDaoFactory daoFactory = new DaoFactory();
+        ScheduleDao scheduleDao = (ScheduleDao) daoFactory.getDao(Schedule.class);
+        DaoResult<List<Schedule>> getSchedulesResult = scheduleDao.getSchedules(planner, dateFrom, dateTo);
+
+        if (!getSchedulesResult.didSucceed()) {
+            throw new ServletException(getSchedulesResult.getException());
+        }
 
         request.setAttribute("planner", planner);
+        request.setAttribute("schedules", getSchedulesResult.getData());
+        request.setAttribute("currentYear", calendar.get(GregorianCalendar.YEAR));
+        request.setAttribute("currentMonth", calendar.get(GregorianCalendar.MONTH));
         request.getRequestDispatcher("/planner.jsp").forward(request, response);
     }
 
@@ -140,10 +202,7 @@ public class PlannerServlet extends HttpServlet {
         }
     }
 
-    private RequirePlannerResult requirePlanner(HttpServletRequest request, User user)
-            throws ServletException, IOException {
-        int plannerId = parsePlannerId(request.getPathInfo());
-
+    private RequirePlannerResult requirePlanner(int plannerId, User user) throws ServletException, IOException {
         if (plannerId < 0) {
             return RequirePlannerResult.fail(HttpServletResponse.SC_NOT_FOUND);
         }

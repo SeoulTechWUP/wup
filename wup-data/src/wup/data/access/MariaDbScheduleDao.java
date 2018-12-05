@@ -23,8 +23,8 @@ public class MariaDbScheduleDao extends MariaDbDao implements ScheduleDao {
 
     private static final String TABLE_NAME = "schedule";
 
-    private static final String SQL_GET_BY_PLANNER = "SELECT * FROM `schedule` WHERE `planner` = ? ORDER BY `starts_at` ASC";
-    private static final String SQL_GET_BY_RANGE = "SELECT * FROM `schedule` WHERE `planner` = ? AND (`starts_at` BETWEEN ? AND ? OR `ends_at` BETWEEN ? AND ?) ORDER BY `starts_at` ASC";
+    private static final String SQL_GET_BY_PLANNER = "SELECT * FROM `schedule` WHERE `planner_id` = ? ORDER BY `starts_at` ASC";
+    private static final String SQL_GET_BY_RANGE = "SELECT * FROM `schedule` WHERE `planner_id` = ? AND (`starts_at` BETWEEN ? AND ? OR `ends_at` BETWEEN ? AND ?) ORDER BY `starts_at` ASC";
     private static final String SQL_CREATE = "INSERT INTO `schedule` (`created_at`, `modified_at`, `planner_id`, `title`, `description`, `starts_at`, `ends_at`, `allday`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     public MariaDbScheduleDao(JdbcConnectionProvider connectionProvider) {

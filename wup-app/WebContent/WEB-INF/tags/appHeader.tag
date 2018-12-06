@@ -1,9 +1,13 @@
 <%@ tag language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ attribute name="title" rtexprvalue="true" %>
+<%@ attribute name="href" rtexprvalue="true" %>
 <jsp:useBean id="authenticatedUser" class="wup.data.User" scope="session" />
 <header>
     <div id="app-title">
-        <span>WUP &mdash; What's Your Plan?</span>
+        <c:if test="${href != null}"><a href="${href}"></c:if>
+        <span>${title == null ? "WUP &mdash; What's Your Plan?" : title}</span>
+        <c:if test="${href != null}"></a></c:if>
     </div>
     <div>
         <c:choose>

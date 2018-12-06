@@ -50,6 +50,15 @@
 					</c:forEach>
 				</c:otherwise>
 			</c:choose>
+			<tr>
+				<td colspan="3">
+					<a href="<c:url value="/board/${PageBlockStart - PageBlockRange - 1}"/>">이전</a> &nbsp;
+					<c:forEach var="page" begin="${PageBlockStart}" end="${PageBlockStart + PageBlockRange - 1}" step="1">
+						<a href="<c:url value="/board/${page}"/>"><c:out value="${page}"/></a> &nbsp;
+					</c:forEach>
+					<a href="<c:url value="/board/${PageBlockStart + PageBlockRange}"/>">다음</a>
+				</td>
+			</tr>
 		</table>
 	</div>
 </body>

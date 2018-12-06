@@ -26,12 +26,12 @@ public class PostListServlet extends HttpServlet {
 	private static final Pattern BoardURLPattern;
 	
 	static {
-	    BoardURLPattern = Pattern.compile("^/(?<page>[0-9]+$)");
+	    BoardURLPattern = Pattern.compile("^/(?<page>[1-9][0-9]*)$");
 	}
 	
 	private int VaildatePath(String pathString, int total) {
 	    int page = -1;
-	    
+
         if (pathString == null) {
             return page;
         }
@@ -64,18 +64,12 @@ public class PostListServlet extends HttpServlet {
         List<Post> postlist = new ArrayList<Post>();
         int total = 0;
         
-        int pageNum = VaildatePath(request.getPathInfo(), total);
-        
-        if (pageNum == -1) {
-            response.sendRedirect(contextPath + "/board/1");
-            return;
-        }
-        
         DaoResult<Integer> getTotalCount = PostDao.getPostCount();
         
         if(getTotalCount.didSucceed()) {
             total = getTotalCount.getData();
-            request.setAttribute("total", total);
+            
+            request.setAttribute("TotalPage", total);
         }
         else {
             //error 페이지로 forwarding 해야함
@@ -83,6 +77,13 @@ public class PostListServlet extends HttpServlet {
             System.out.println(getTotalCount.getException().getMessage());
         }
 
+        int pageNum = VaildatePath(request.getPathInfo(), total);
+        
+        if (pageNum == -1) {
+            response.sendRedirect(contextPath + "/board/1");
+            return;
+        }
+        
         DaoResult<List<Post>> getPostList = PostDao.getPosts((pageNum - 1)*PAGE_VIEW, PAGE_VIEW);
 
 

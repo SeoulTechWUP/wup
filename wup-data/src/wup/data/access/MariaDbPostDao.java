@@ -27,7 +27,7 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
     private static final String TABLE_NAME = "post";
 
     private static final String SQL_GET_RECENT = "SELECT * FROM `post` ORDER BY `created_at` DESC LIMIT ?";
-    private static final String SQL_GET_PAGING = "SELECT * FROM `post` DESC LIMIT ?, ?";
+    private static final String SQL_GET_PAGING = "SELECT * FROM `post` ORDER BY `created_at` DESC LIMIT ?, ?";
     private static final String SQL_GET_COUNT = "SELECT COUNT(*) FROM `post`";
     private static final String SQL_GET_RANGE = "SELECT * FROM `post` WHERE `created_at` BETWEEN ? AND ? ORDER BY `created_at` DESC";
     private static final String SQL_GET_BY_USER = "SELECT * FROM `post` WHERE `type` = 'user' AND `user_id` = ?";

@@ -17,10 +17,29 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebServlet("/Board")
+@WebServlet("/board/*")
 public class PostListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
+	private static final int PAGE_VIEW = 20;
+	
+	private int VaildatePath(String pathString, int total) {
+	    int page = -1;
+	    
+	    if (pathString != null) {
+	        if(pathString.equals("/")) {return page;}
+	        String[] path = pathString.split("/");
+	        if(!path[1].equals("")) {
+	            try {
+	                Integer.parseInt(path[1]);
+	                if(Integer.parseInt(path[1]) < (total/PAGE_VIEW) + 2) {
+	                    page = Integer.parseInt(path[1]);
+	                }
+	            } catch (final NumberFormatException e){}
+	        }
+	    }
+	    return page;
+	}
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 	        throws ServletException, IOException {
 	       
@@ -32,9 +51,30 @@ public class PostListServlet extends HttpServlet {
         PostDao PostDao = (PostDao) daoFactory.getDao(Post.class);
 
         List<Post> postlist = new ArrayList<Post>();
+        int total = 0;
         
-        DaoResult<List<Post>> getPostList = PostDao.getPosts(10);
+        DaoResult<Integer> getTotalCount = PostDao.getPostCount();
         
+        if(getTotalCount.didSucceed()) {
+            total = getTotalCount.getData();
+            request.setAttribute("total", total);
+        }
+        else {
+            //error 페이지로 forwarding 해야함
+            request.setAttribute("BoardErrorMessage", getTotalCount.getException().getMessage());
+            System.out.println(getTotalCount.getException().getMessage());
+        }
+        
+        int pageNum = VaildatePath(request.getPathInfo(), total);
+        
+        if (pageNum == -1) {
+            response.sendRedirect(contextPath + "/board/1");
+            return;
+        }
+
+        DaoResult<List<Post>> getPostList = PostDao.getPosts((pageNum - 1)*PAGE_VIEW, PAGE_VIEW);
+
+
         if(getPostList.didSucceed()) {
             postlist = getPostList.getData();
             request.setAttribute("postlist", postlist);
@@ -49,9 +89,6 @@ public class PostListServlet extends HttpServlet {
         catch (ServletException e) {  System.out.println(e); }
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	        throws ServletException, IOException {
 	    

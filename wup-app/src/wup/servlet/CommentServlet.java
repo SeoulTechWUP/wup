@@ -50,7 +50,7 @@ public class CommentServlet extends HttpServlet {
    }
    
    //포스트 객체 반환 메소드
-   private Post selectPost(int id) {
+   private Object selectPost(int id) {
        MariaDbDaoFactory daoFactory = new DaoFactory();
        PostDao PostDao = (PostDao) daoFactory.getDao(Post.class);
        DaoResult<Post> getPost = PostDao.getPost(id);
@@ -58,7 +58,7 @@ public class CommentServlet extends HttpServlet {
        if(getPost.didSucceed()) {
            return getPost.getData();
        } else {
-           return null;
+           return getPost.getException().getMessage();
        }
    }
    
@@ -89,18 +89,20 @@ public class CommentServlet extends HttpServlet {
         
         DaoResult<List<Comment>> getComments;
         List<Comment> comments = new ArrayList<Comment>();
-        Post post;
+        
+        Object post;
         
         int postNum = ValidatePath(ServletHelper.trimString(request.getPathInfo()));
         
         if (postNum > 0) {
             post = selectPost(postNum);
             
-            if(post != null) {
-                getComments = CommentDao.getComments(post);
+            if(post instanceof Post) {
+                getComments = CommentDao.getComments((Post)post);
             } else {
-                request.setAttribute("GetCommentErrorMessage", "Wrong Path: " + request.getPathInfo());
-                System.out.println("Wrong Path: " + request.getPathInfo());
+                //요청 에러
+                request.setAttribute("GetCommentErrorMessage", (String)post);
+                System.out.println("db error: " + (String)post);
                 return;
             }
         } else {
@@ -109,6 +111,7 @@ public class CommentServlet extends HttpServlet {
             System.out.println("Wrong Path: " + request.getPathInfo());
             return;
         }
+
 
         if(getComments.didSucceed()) {
             comments = getComments.getData();
@@ -119,7 +122,7 @@ public class CommentServlet extends HttpServlet {
             request.setAttribute("GetCommentErrorMessage", getComments.getException().getMessage());
             System.out.println(getComments.getException().getMessage());
             return;
-        }
+        }   
 	}
 
 

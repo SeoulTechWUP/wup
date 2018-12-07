@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,10 +39,6 @@ public class CommentServlet extends HttpServlet {
    //URL 검사 메소드
    private int ValidatePath(String pathString) {
        int post = -1;
-
-       if (pathString == null) {
-           return post;
-       }
        
        Matcher mat = CommentURLPattern.matcher(pathString);
        
@@ -65,8 +62,27 @@ public class CommentServlet extends HttpServlet {
        }
    }
    
+   //json 변환 메소드
+   private String makeJSON(Object obj, String result) {
+       Gson gson = new Gson();
+       JsonObject jobj = new JsonObject();
+       
+       String objson = gson.toJson(obj);
+       String json;
+       
+       jobj.addProperty("data", objson);
+       jobj.addProperty("result", result);
+       
+       json = gson.toJson(jobj);
+       
+       return json;
+   }
+   
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 	        throws ServletException, IOException {
+	    
+	    request.setCharacterEncoding("UTF-8");
+	    response.setCharacterEncoding("UTF-8");
 	    
         MariaDbDaoFactory daoFactory = new DaoFactory();
         CommentDao CommentDao = (CommentDao) daoFactory.getDao(Comment.class);
@@ -75,7 +91,7 @@ public class CommentServlet extends HttpServlet {
         List<Comment> comments = new ArrayList<Comment>();
         Post post;
         
-        int postNum = ValidatePath(request.getPathInfo());
+        int postNum = ValidatePath(ServletHelper.trimString(request.getPathInfo()));
         
         if (postNum > 0) {
             post = selectPost(postNum);
@@ -112,6 +128,7 @@ public class CommentServlet extends HttpServlet {
 	    
         MariaDbDaoFactory daoFactory = new DaoFactory();
         CommentDao CommentDao = (CommentDao) daoFactory.getDao(Comment.class);
+        
 	}
 
 }

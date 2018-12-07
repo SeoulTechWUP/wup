@@ -34,10 +34,6 @@ public class PostListServlet extends HttpServlet {
 	private int ValidatePath(String pathString, int total) {
 	    int page = 0;
 
-        if (pathString == null) {
-            return page;
-        }
-	    
 	    Matcher mat = BoardURLPattern.matcher(pathString);
 	    
 	    if(mat.matches()) {
@@ -55,7 +51,7 @@ public class PostListServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 	        throws ServletException, IOException {
-	       
+	    
 	    ServletContext app = this.getServletContext();
 	    String contextPath = request.getContextPath(); //redirect시에
 	    RequestDispatcher dispatcher = app.getRequestDispatcher("/board.jsp"); //forwarding 시에 dispatcher
@@ -80,10 +76,11 @@ public class PostListServlet extends HttpServlet {
             //error 페이지로 forwarding 해야함
             request.setAttribute("BoardErrorMessage", getTotalCount.getException().getMessage());
             System.out.println(getTotalCount.getException().getMessage());
+            return;
         }
         
         maxPage = (total/PAGE_VIEW) + 1;
-        int pageNum = ValidatePath(request.getPathInfo(), total); //현재 페이지 수 (0 이하 값일 경우 잘못된 경로)
+        int pageNum = ValidatePath(ServletHelper.trimString(request.getPathInfo()), total); //현재 페이지 수 (0 이하 값일 경우 잘못된 경로)
         
         if (pageNum <= 0) {
             if (pageNum < 0) { //요청 페이지가 최대 페이지를 넘는 경우

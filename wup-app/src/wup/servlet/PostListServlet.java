@@ -31,7 +31,7 @@ public class PostListServlet extends HttpServlet {
 	}
 	
 	//URL 검사 메소드
-	private int VaildatePath(String pathString, int total) {
+	private int ValidatePath(String pathString, int total) {
 	    int page = 0;
 
         if (pathString == null) {
@@ -83,7 +83,7 @@ public class PostListServlet extends HttpServlet {
         }
         
         maxPage = (total/PAGE_VIEW) + 1;
-        int pageNum = VaildatePath(request.getPathInfo(), total); //현재 페이지 수 (0 이하 값일 경우 잘못된 경로)
+        int pageNum = ValidatePath(request.getPathInfo(), total); //현재 페이지 수 (0 이하 값일 경우 잘못된 경로)
         
         if (pageNum <= 0) {
             if (pageNum < 0) { //요청 페이지가 최대 페이지를 넘는 경우
@@ -121,7 +121,7 @@ public class PostListServlet extends HttpServlet {
             request.setAttribute("BoardErrorMessage", getPostList.getException().getMessage());
             System.out.println(getPostList.getException().getMessage());
         }
-
+        
         try { dispatcher.forward(request, response); } 
         catch (ServletException e) {  System.out.println(e); }
 	}

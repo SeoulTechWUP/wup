@@ -25,7 +25,9 @@ import wup.data.access.DaoResult;
 import wup.data.access.MariaDbDaoFactory;
 
 /**
- * Servlet implementation class CommentServlet
+ * comment를 ajax 통신을 이용해 처리 하기 위한 서블릿
+ * 
+ * @author WonHyun
  */
 @WebServlet("/comment/*")
 public class CommentServlet extends HttpServlet {
@@ -83,6 +85,7 @@ public class CommentServlet extends HttpServlet {
 	    
 	    request.setCharacterEncoding("UTF-8");
 	    response.setCharacterEncoding("UTF-8");
+	    response.setContentType("application/json");
 	    
         MariaDbDaoFactory daoFactory = new DaoFactory();
         CommentDao CommentDao = (CommentDao) daoFactory.getDao(Comment.class);
@@ -100,29 +103,33 @@ public class CommentServlet extends HttpServlet {
             if(post instanceof Post) {
                 getComments = CommentDao.getComments((Post)post);
             } else {
-                //요청 에러
+                //post 조회 요청 에러
                 request.setAttribute("GetCommentErrorMessage", (String)post);
+                response.getWriter().write(makeJSON(comments,"fail"));
                 System.out.println("db error: " + (String)post);
                 return;
             }
         } else {
             //경로가 정확하지 않음
             request.setAttribute("GetCommentErrorMessage", "Wrong Path: " + request.getPathInfo());
+            response.getWriter().write(makeJSON(comments,"fail"));
             System.out.println("Wrong Path: " + request.getPathInfo());
             return;
         }
-
 
         if(getComments.didSucceed()) {
             comments = getComments.getData();
             request.setAttribute("Comments", comments);
         }
         else {
-            //요청 에러
+            //comment 요청 에러
             request.setAttribute("GetCommentErrorMessage", getComments.getException().getMessage());
+            response.getWriter().write(makeJSON(comments,"fail"));
             System.out.println(getComments.getException().getMessage());
             return;
         }   
+        
+        response.getWriter().write(makeJSON(comments,"success"));
 	}
 
 

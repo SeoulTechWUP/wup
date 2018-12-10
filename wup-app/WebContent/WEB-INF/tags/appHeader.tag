@@ -3,11 +3,24 @@
 <%@ attribute name="title" rtexprvalue="true" %>
 <%@ attribute name="href" rtexprvalue="true" %>
 <jsp:useBean id="authenticatedUser" class="wup.data.User" scope="session" />
+<c:choose>
+    <c:when test="${title == null}">
+        <c:set var="titleText" value="WUP &mdash; What's Your Plan?" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="titleText" value="${title}" />
+    </c:otherwise>
+</c:choose>
 <header>
     <div id="app-title">
-        <c:if test="${href != null}"><a href="${href}"></c:if>
-        <span>${title == null ? "WUP &mdash; What's Your Plan?" : title}</span>
-        <c:if test="${href != null}"></a></c:if>
+        <c:choose>
+            <c:when test="${href != null}">
+                <a href="${href}"><span><span class="icon arrow left"></span>&nbsp; ${titleText}</span></a>
+            </c:when>
+            <c:otherwise>
+                <span>${titleText}</span>
+            </c:otherwise>
+        </c:choose>
     </div>
     <div>
         <c:choose>

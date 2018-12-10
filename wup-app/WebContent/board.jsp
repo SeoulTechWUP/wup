@@ -35,7 +35,7 @@
 				<c:otherwise>
 					<c:forEach items="${postlist}" var="post">
 						<c:set var="post" value="${post}" scope="request"/>
-						<tr class="dropdown-post">
+						<tr>
 							<td colspan="3">
 								<jsp:include page="/PostView.jsp" flush="true">
 									<jsp:param value="${post}" name="post" />

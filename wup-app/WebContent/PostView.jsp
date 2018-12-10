@@ -17,10 +17,10 @@
 <div class="Post">
 	<div class="summary">
 		<fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd"/> &nbsp;&nbsp;
-		<a href="#" data-toggle="dropdown" onclick="expandToggle(${post.id})">${post.title}</a> &nbsp;&nbsp;
+		<a href="#" onclick="expandToggle(${post.id})">${post.title}</a> &nbsp;&nbsp;
 		${post.owner.getNickname()} &nbsp;&nbsp;
 	</div>
-	<div class="expand" id="expand${post.id}" style="display:none;">
+	<div class="expand" id="expand-${post.id}" style="display:none;">
 		<div id = "Media">
 	    <div id="Image">
 	    </div>
@@ -38,22 +38,8 @@
 			좋아요
 			</button>
 		</div>
-		<div id = "Comment">
-			<div id = "CommentList">
-				<c:choose>
-					<c:when test="${commentlist.size() eq '0'}">
-						<td colspan="3"><p>댓글이 없습니다.</p></td>
-					</c:when>
-					<c:otherwise>
-						<c:forEach items="${commentlist}" var="comment">
-							<c:set var="comment" value="${comment}" scope="request"/>
-								(Avatar) &nbsp;
-								<a href="#" data-toggle="dropdown">${comment.getText()}</a> &nbsp;
-								<fmt:formatDate value="${comment.createdAt}" pattern="yyyy.MM.dd"/> &nbsp;
-								${comment.getUser()}
-						</c:forEach>
-					</c:otherwise>
-				</c:choose>
+		<div class = "Comment">
+			<div id = "CommentList-${post.id}">
 				
 			</div>
 			<div id="CommentInput">
@@ -70,14 +56,7 @@
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script type="text/javascript">
 
-function expandToggle(id) {
-	var x = document.getElementById("expand"+ id);
-	if (x.style.display === "none") {
-	  x.style.display = "block";
-	} else {
-	  x.style.display = "none";
-	}
-}
+var loadedList = new Array();
 
 $.ajaxSetup({
     type:"GET",
@@ -88,31 +67,55 @@ $.ajaxSetup({
     }
 });
 
-$.ajax({
-    url:"${pageContext.request.contextPath}"+"/comment/"+"${post.id}",
-    beforeSend:function() {
-        console.log("읽어오기 시작 전...");
-    },
-    complete:function() {
-        console.log("읽어오기 완료 후...");
-    },
-    success:function(data) {
-        console.log("comment를 정상적으로 조회하였습니다.");
-        $.each(data, function(idx, item){
-            if(data["result"] == "success" && idx == "data") {
-				showComments(item);
-            }
+function expandToggle(id) {
+	var x = document.getElementById("expand-"+ id);
+	if (x.style.display === "none") {
+		
+		if(loadedList.indexOf(id) == -1) {
+			requestAjax(id);
+			loadedList.push(id);
+		}
+		
+		x.style.display = "block";
+	} 
+	else {
+		x.style.display = "none";
+	}
+}
+
+function requestAjax(id) {
+	$.ajax({
+	    url:"${pageContext.request.contextPath}"+"/comment/" + id,
+	    beforeSend:function() {
+	        console.log("읽어오기 시작 전...");
+	    },
+	    complete:function() {
+	        console.log("읽어오기 완료 후...");
+	    },
+	    success:function(data) {
+	        console.log("comment를 정상적으로 조회하였습니다.");
+	        $.each(data, function(idx, item){
+	            if(data["result"] == "success" && idx == "data") {
+	            	showComments(item, id);
+	            }
+	        });
+	    }
+	});
+}
+
+function showComments(item, id){
+    var comments = JSON.parse(item);
+    if(comments.length < 1) {
+		$("#CommentList-" + id).append("댓글이 없습니다.");
+		$("#CommentList-" + id).append("<br>");
+    }
+    else {
+        comments.forEach(function(value) {
+           	console.log(id + " = "+ value["text"]);
+    		$("#CommentList-" + id).append(value["text"]);
+    		$("#CommentList-" + id).append("<br>");
         });
     }
-});
-
-function showComments(item){
-    var comments = JSON.parse(item);
-    comments.forEach(function(value) {
-       	console.log("${post.id}"+" = "+ value["text"]);
-		$("#CommentList").append(value["text"]);
-		$("#CommentList").append("<br>");
-    });
 }
 
 </script>

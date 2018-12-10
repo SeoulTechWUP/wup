@@ -19,6 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * 포스트처리에 관한 서블릿
+ * 
+ * @author WonHyun
+ */
 @WebServlet("/board/*")
 public class PostListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

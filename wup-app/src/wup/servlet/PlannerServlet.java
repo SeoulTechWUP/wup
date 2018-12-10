@@ -232,22 +232,6 @@ public class PlannerServlet extends HttpServlet {
         }
     }
 
-    private int parsePlannerId(String pathInfo) {
-        if (pathInfo == null || pathInfo.isEmpty()) {
-            return -1;
-        }
-
-        if (pathInfo.startsWith("/")) {
-            pathInfo = pathInfo.substring(1);
-        }
-
-        try {
-            return Integer.parseInt(pathInfo);
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
     private DaoResult<Boolean> hasAccess(Planner planner, User user) {
         if (planner.getType() == ItemOwner.Type.USER) {
             // 플래너 소유자 일치 여부 확인

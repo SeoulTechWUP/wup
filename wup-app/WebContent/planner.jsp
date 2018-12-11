@@ -1,26 +1,27 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.util.GregorianCalendar" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="wup" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="planner" class="wup.data.Planner" scope="request" />
 <c:choose>
-    <c:when test="${requestScope.currentMonth == 0}">
+    <c:when test="${currentMonth == 0}">
         <c:set var="prevMonth" value="12" />
-        <c:set var="prevYear" value="${requestScope.currentYear - 1}" />
+        <c:set var="prevYear" value="${currentYear - 1}" />
     </c:when>
     <c:otherwise>
-        <c:set var="prevMonth" value="${requestScope.currentMonth}" />
-        <c:set var="prevYear" value="${requestScope.currentYear}" />
+        <c:set var="prevMonth" value="${currentMonth}" />
+        <c:set var="prevYear" value="${currentYear}" />
     </c:otherwise>
 </c:choose>
 <c:choose>
-    <c:when test="${requestScope.currentMonth == 11}">
+    <c:when test="${currentMonth == 11}">
         <c:set var="nextMonth" value="1" />
-        <c:set var="nextYear" value="${requestScope.currentYear + 1}" />
+        <c:set var="nextYear" value="${currentYear + 1}" />
     </c:when>
     <c:otherwise>
-        <c:set var="nextMonth" value="${requestScope.currentMonth + 2}" />
-        <c:set var="nextYear" value="${requestScope.currentYear}" />
+        <c:set var="nextMonth" value="${currentMonth + 2}" />
+        <c:set var="nextYear" value="${currentYear}" />
     </c:otherwise>
 </c:choose>
 <!DOCTYPE html>
@@ -71,6 +72,26 @@
                                     </div>
                                 </header>
                                 <div class="main">
+                                    <table class="calendar">
+                                        <thead>
+                                            <tr>
+                                                <th>일</th>
+                                                <th>월</th>
+                                                <th>화</th>
+                                                <th>수</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="small">
+                                            <c:forEach begin="0" end="5" var="row">
+                                                <tr>
+                                                    <c:forEach begin="1" end="4" var="col">
+                                                        <c:set var="date" value="${row * 7 + col - startingWeekday + 1}" />
+                                                        <td><div><c:if test="${date >= 1 && date <= lastDate}">${date}</c:if></td></div>
+                                                    </c:forEach>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -81,6 +102,27 @@
                                 <header>
                                 </header>
                                 <div class="main">
+                                    <table class="calendar">
+                                        <thead>
+                                            <tr>
+                                                <th>목</th>
+                                                <th>금</th>
+                                                <th>토</th>
+                                                <th>&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="small">
+                                            <c:forEach begin="0" end="5" var="row">
+                                                <tr>
+                                                    <c:forEach begin="5" end="7" var="col">
+                                                        <c:set var="date" value="${row * 7 + col - startingWeekday + 1}" />
+                                                        <td><div><c:if test="${date >= 1 && date <= lastDate}">${date}</c:if></td></div>
+                                                    </c:forEach>
+                                                    <td></td>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

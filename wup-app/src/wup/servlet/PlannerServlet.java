@@ -103,9 +103,10 @@ public class PlannerServlet extends HttpServlet {
         }
 
         Planner planner = rp.planner;
-        GregorianCalendar calendar = new GregorianCalendar(year, month, 1);
-        Date dateFrom = calendar.getTime();
-        Date dateTo = new GregorianCalendar(year, month + 1, 0).getTime();
+        GregorianCalendar calendarFrom = new GregorianCalendar(year, month, 1);
+        GregorianCalendar calendarTo = new GregorianCalendar(year, month + 1, 0);
+        Date dateFrom = calendarFrom.getTime();
+        Date dateTo = calendarTo.getTime();
 
         MariaDbDaoFactory daoFactory = new DaoFactory();
         ScheduleDao scheduleDao = (ScheduleDao) daoFactory.getDao(Schedule.class);
@@ -117,8 +118,10 @@ public class PlannerServlet extends HttpServlet {
 
         request.setAttribute("planner", planner);
         request.setAttribute("schedules", getSchedulesResult.getData());
-        request.setAttribute("currentYear", calendar.get(GregorianCalendar.YEAR));
-        request.setAttribute("currentMonth", calendar.get(GregorianCalendar.MONTH));
+        request.setAttribute("currentYear", calendarFrom.get(GregorianCalendar.YEAR));
+        request.setAttribute("currentMonth", calendarFrom.get(GregorianCalendar.MONTH));
+        request.setAttribute("startingWeekday", calendarFrom.get(GregorianCalendar.DAY_OF_WEEK));
+        request.setAttribute("lastDate", calendarTo.get(GregorianCalendar.DAY_OF_MONTH));
         request.getRequestDispatcher("/planner.jsp").forward(request, response);
     }
 

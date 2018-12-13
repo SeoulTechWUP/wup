@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -18,6 +19,7 @@ import java.util.regex.Matcher;
 
 import wup.data.Comment;
 import wup.data.Post;
+import wup.data.User;
 import wup.data.access.CommentDao;
 import wup.data.access.PostDao;
 import wup.data.access.DaoFactory;
@@ -136,9 +138,36 @@ public class CommentServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	        throws ServletException, IOException {
 	    
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        
         MariaDbDaoFactory daoFactory = new DaoFactory();
         CommentDao CommentDao = (CommentDao) daoFactory.getDao(Comment.class);
         
+        String content = request.getParameter("content");
+        int postnum = Integer.parseInt(request.getParameter("postnum"));
+    
+        HttpSession session = request.getSession();
+        User user = (User)session.getAttribute("authenticatedUser");
+        
+        if(user == null || user.getEmail() == null) {
+            response.getWriter().write(makeJSON(null,"userfail"));
+            return;
+        }
+        
+        Post post = new Post();
+        Comment comment = new Comment();
+        post.setId(postnum);
+        comment.setText(content);
+        
+        DaoResult<Comment> createComment = CommentDao.createComment(post, user, comment);
+        
+        if(createComment.didSucceed()) {
+            response.getWriter().write(makeJSON(null,"success"));
+        } else {
+            response.getWriter().write(makeJSON(createComment.getException().getMessage(),"dbfail"));
+            return;
+        }
 	}
-
 }

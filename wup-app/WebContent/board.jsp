@@ -90,6 +90,7 @@
 <script type="text/javascript">
 
 let loadedList = new Array();
+var context = "${pageContext.request.contextPath}";
 
 window.onload = function () {
 	let elements = document.getElementsByClassName("Post");
@@ -136,8 +137,9 @@ function expandToggle(id) {
 function createComment(id){
 	let e = selectElement(id, "ContentArea");
 
-	if(e.val() != "") {
-		requestPostAjax(id);
+	if($(e).val() != "") {
+		requestPostAjax(id, $(e).val());
+		e.value = "";
 	}
 	else {
 		alert("댓글을 입력해 주세요.");
@@ -155,25 +157,27 @@ function requestGetAjax(id) {
 	});
 	
 	$.ajax({
-	    url:"${pageContext.request.contextPath}"+"/comment/" + id,
-	    beforeSend:function() {
-	        console.log("읽어오기 시작 전...");
-	    },
+	    url:context + "/comment/" + id,
 	    complete:function() {
 	        console.log("읽어오기 완료 후...");
 	    },
 	    success:function(data) {
-	        console.log("comment를 정상적으로 조회하였습니다.");
 	        $.each(data, function(idx, item){
 	            if(data["result"] == "success" && idx == "data") {
+	            	console.log("comment를 정상적으로 조회하였습니다.");
 	            	showComments(item, id);
+	            	return false;
+	            }
+	            else if(data["result"] == "fail"){
+	            	console.log("comment db 조회 접근 에러");
+	            	return false;
 	            }
 	        });
 	    }
 	});
 }
 
-function requestPostAjax(id) {
+function requestPostAjax(id, content) {
 	$.ajaxSetup({
 	    type:"POST",
 	    async:true,
@@ -184,19 +188,32 @@ function requestPostAjax(id) {
 	});
 	
 	$.ajax({
-	    url:"${pageContext.request.contextPath}"+"/comment/",
+	    url:context + "/comment/",
 	    data:{
-	    	content:$("#ContentArea").val(),
+	    	content:content,
 	    	postnum:id
-	    },
-	    beforeSend:function() {
-	        console.log("읽어오기 시작 전...");
 	    },
 	    complete:function() {
 	        console.log("읽어오기 완료 후...");
 	    },
 	    success:function(data) {
-	        console.log("comment를 정상적으로 추가하였습니다.");	
+	    	$.each(data, function(idx, item){
+	            if(data["result"] == "success" && idx == "data") {
+	            	console.log("comment를 정상적으로 추가하였습니다.");
+	            	requestGetAjax(id);
+	            	return false;
+	            }
+	            else if(data["result"] == "userfail"){
+	            	alert("로그인 후에 댓글을 작성하실 수 있습니다.");
+	            	window.location.href = context + "/login.jsp";
+	            	return false;
+	            }
+	            else if(data["result"] == "dbfail"){
+	            	console.log("comment db 추가 접근 에러");
+	            	alert("db error : " + data["data"]);
+	            	return false;
+	            }
+	        });
 	    }
 	});
 }
@@ -204,6 +221,7 @@ function requestPostAjax(id) {
 function showComments(item, id){
     var comments = JSON.parse(item);
     let e = selectElement(id, "CommentList");
+    $(e).empty();
     
  	if(comments.length < 1) {
 		$(e).append("댓글이 없습니다.");

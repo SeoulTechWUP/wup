@@ -14,80 +14,91 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>WUP! - 공유 게시판</title>
+    <title>공유 게시판 | WUP</title>
+    <wup:includeAssets />
 </head>
 
 <body>
-    <div>
-        <h1>공유 게시판</h1>
-    </div>
-    <div>
-        <table>
-            <tr>
-                <td>작성일</td>
-                <td>제목</td>
-                <td>작성자</td>
-            </tr>
-            <c:choose>
-                <c:when test="${postlist.size() eq '0'}">
-                    <tr>
-                        <td colspan="3">
-                            <p>게시물이 없습니다.</p>
-                        </td>
-                    </tr>
-                </c:when>
-                <c:otherwise>
-                    <c:forEach items="${postlist}" var="post">
+    <div id="app-main" class="app">
+        <wup:appHeader />
+        <main>
+            <div id="planner-list">
+                <header>
+                    <h1>공유 게시판<a class="switch-category" href="<c:url value="/planners" />">개인</a><a class="switch-category"
+                            href="<c:url value="/groups" />">그룹</a></h1>
+                </header>
+                <div>
+                    <table>
+                        <tr>
+                            <td>작성일</td>
+                            <td>제목</td>
+                            <td>작성자</td>
+                        </tr>
+                        <c:choose>
+                            <c:when test="${postlist.size() eq '0'}">
+                                <tr>
+                                    <td colspan="3">
+                                        <p>게시물이 없습니다.</p>
+                                    </td>
+                                </tr>
+                            </c:when>
+                            <c:otherwise>
+                                <c:forEach items="${postlist}" var="post">
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="Post" data-post-id="${post.id}">
+                                                <div class="summary">
+                                                    <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd" />
+                                                    &nbsp;&nbsp;
+                                                    <a class="expandPost" href="#">${post.title}</a> &nbsp;&nbsp;
+                                                    ${post.owner.getNickname()} &nbsp;&nbsp;
+                                                </div>
+                                                <div class="expand" style="display:none;">
+                                                    <div id="Media">
+                                                        <div id="Image">
+                                                            <img alt="" src=""></img>
+                                                        </div>
+                                                        <div id="Text">
+                                                            <p>
+                                                                ${post.getText()}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="Like">
+                                                        <button id="LikeButton">
+                                                            좋아요
+                                                        </button>
+                                                    </div>
+                                                    <div class="Comment">
+                                                        <div class="CommentList">
+                                                        </div>
+                                                        <div class="CommentInput">
+                                                            <textarea class="ContentArea" placeholder="댓글을 입력하세요."></textarea>
+                                                            <button class="CommentSubmitButton" type="submit">댓글달기</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:otherwise>
+                        </c:choose>
                         <tr>
                             <td colspan="3">
-                                <div class="Post" data-post-id="${post.id}">
-                                    <div class="summary">
-                                        <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd" /> &nbsp;&nbsp;
-                                        <a class="expandPost" href="#">${post.title}</a> &nbsp;&nbsp;
-                                        ${post.owner.getNickname()} &nbsp;&nbsp;
-                                    </div>
-                                    <div class="expand" style="display:none;">
-                                        <div id="Media">
-                                            <div id="Image">
-                                                <img alt="" src=""></img>
-                                            </div>
-                                            <div id="Text">
-                                                <p>
-                                                    ${post.getText()}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div id="Like">
-                                            <button id="LikeButton">
-                                                좋아요
-                                            </button>
-                                        </div>
-                                        <div class="Comment">
-                                            <div class="CommentList">
-                                            </div>
-                                            <div class="CommentInput">
-                                                <textarea class="ContentArea" placeholder="댓글을 입력하세요."></textarea>
-                                                <button class="CommentSubmitButton" type="submit">댓글달기</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <a href="<c:url value="/board/${PageBlockStart - PageBlockRange - 1}" />">이전</a> &nbsp;
+                                <c:forEach var="page" begin="${PageBlockStart}" end="${PageBlockStart + PageBlockRange - 1}"
+                                    step="1">
+                                    <a href="<c:url value="/board/${page}"/>"> <c:out value="${page}" /></a> &nbsp;
+                                </c:forEach>
+                                <a href="<c:url value="/board/${PageBlockStart + PageBlockRange}" />">다음</a>
                             </td>
                         </tr>
-                    </c:forEach>
-                </c:otherwise>
-            </c:choose>
-            <tr>
-                <td colspan="3">
-                    <a href="<c:url value="/board/${PageBlockStart - PageBlockRange - 1}" />">이전</a> &nbsp;
-                    <c:forEach var="page" begin="${PageBlockStart}" end="${PageBlockStart + PageBlockRange - 1}" step="1">
-                        <a href="<c:url value="/board/${page}"/>"> <c:out value="${page}" /></a> &nbsp;
-                    </c:forEach>
-                    <a href="<c:url value="/board/${PageBlockStart + PageBlockRange}" />">다음</a>
-                </td>
-            </tr>
-        </table>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>

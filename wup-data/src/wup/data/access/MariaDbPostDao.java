@@ -44,19 +44,19 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
     @Override
     public DaoResult<Integer> getPostCount() {
         try (Connection conn = connectionProvider.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_GET_COUNT)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_GET_COUNT)) {
 
-                try (ResultSet result = stmt.executeQuery()) {
-                    result.next();
-                    int count = result.getInt(1);
+            try (ResultSet result = stmt.executeQuery()) {
+                result.next();
+                int count = result.getInt(1);
 
-                    return DaoResult.succeed(DaoResult.Action.READ, count);
-                }
-            } catch (Exception e) {
-                return DaoResult.fail(DaoResult.Action.READ, e);
+                return DaoResult.succeed(DaoResult.Action.READ, count);
             }
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.READ, e);
+        }
     }
-    
+
     /*
      * (non-Javadoc)
      *
@@ -83,7 +83,7 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
     @Override
     public DaoResult<List<Post>> getPosts(int count) {
         try (Connection conn = connectionProvider.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(SQL_GET_RECENT)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_GET_RECENT)) {
             stmt.setInt(1, count);
 
             try (ResultSet result = stmt.executeQuery()) {
@@ -99,14 +99,14 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
             return DaoResult.fail(DaoResult.Action.READ, e);
         }
     }
-    
+
     @Override
-    public DaoResult<List<Post>> getPosts(int Start, int ViewCount) {
+    public DaoResult<List<Post>> getPosts(int start, int viewCount) {
         try (Connection conn = connectionProvider.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(SQL_GET_PAGING)) {
-            stmt.setInt(1, Start);
-            stmt.setInt(2, ViewCount);
-            
+             PreparedStatement stmt = conn.prepareStatement(SQL_GET_PAGING)) {
+            stmt.setInt(1, start);
+            stmt.setInt(2, viewCount);
+
             try (ResultSet result = stmt.executeQuery()) {
                 List<Post> posts = new ArrayList<Post>();
 
@@ -326,7 +326,8 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
         post.setTitle(rs.getString("title"));
         post.setText(rs.getString("text"));
 
-        DaoResult<Schedule> getScheduleResult = new MariaDbScheduleDao(connectionProvider).getSchedule(rs.getInt("schedule_id"));
+        DaoResult<Schedule> getScheduleResult = new MariaDbScheduleDao(connectionProvider)
+                .getSchedule(rs.getInt("schedule_id"));
 
         if (!getScheduleResult.didSucceed()) {
             throw getScheduleResult.getException();
@@ -344,7 +345,8 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
                     throw getUserResult.getException();
                 }
             } else {
-                DaoResult<Group> getGroupResult = new MariaDbGroupDao(connectionProvider).getGroup(rs.getInt("group_id"));
+                DaoResult<Group> getGroupResult = new MariaDbGroupDao(connectionProvider)
+                        .getGroup(rs.getInt("group_id"));
 
                 if (getGroupResult.didSucceed()) {
                     post.setOwner(getGroupResult.getData());

@@ -16,7 +16,7 @@ public interface PostDao {
      * 포스트의 총 개수를 반환합니다.
      */
     public DaoResult<Integer> getPostCount();
-    
+
     /**
      * 주어진 <code>id</code>에 해당하는 공개 게시물의 정보를 가져옵니다.
      *
@@ -32,13 +32,13 @@ public interface PostDao {
     public DaoResult<List<Post>> getPosts(int count);
 
     /**
-     * 특정 범위의 게시글 리스트를 반환합니다. 
-     * 
-     * @param Start 검색할 게시글 범위 시작 값
-     * @param ViewCount 표시할 포스트의 수량
+     * 특정 범위의 게시글 리스트를 반환합니다.
+     *
+     * @param start     검색할 게시글 범위 시작 값
+     * @param viewCount 표시할 포스트의 수량
      */
-    public DaoResult<List<Post>> getPosts(int Start, int ViewCount);
-    
+    public DaoResult<List<Post>> getPosts(int start, int viewCount);
+
     /**
      * 모든 사용자/그룹이 등록한 공개 게시물 중 지정된 기간 내에 작성된 항목의 리스트를 가져옵니다.
      *

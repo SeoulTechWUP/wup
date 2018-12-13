@@ -88,6 +88,9 @@
 	
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script type="text/javascript">
+//
+//
+//
 
 let loadedList = new Array();
 var context = "${pageContext.request.contextPath}";

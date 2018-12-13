@@ -20,13 +20,15 @@ import wup.data.User;
 /**
  * MariaDB를 통해 공개 게시물 정보에 접근하는 DAO입니다.
  *
- * @author Eunbin Jeong
+ * @author Eunbin Jeong, Won Hyun
  */
 public class MariaDbPostDao extends MariaDbDao implements PostDao {
 
     private static final String TABLE_NAME = "post";
 
     private static final String SQL_GET_RECENT = "SELECT * FROM `post` ORDER BY `created_at` DESC LIMIT ?";
+    private static final String SQL_GET_PAGING = "SELECT * FROM `post` ORDER BY `created_at` DESC LIMIT ?, ?";
+    private static final String SQL_GET_COUNT = "SELECT COUNT(*) FROM `post`";
     private static final String SQL_GET_RANGE = "SELECT * FROM `post` WHERE `created_at` BETWEEN ? AND ? ORDER BY `created_at` DESC";
     private static final String SQL_GET_BY_USER = "SELECT * FROM `post` WHERE `type` = 'user' AND `user_id` = ?";
     private static final String SQL_GET_BY_GROUP = "SELECT * FROM `post` WHERE `type` = 'group` AND `group_id` = ?";
@@ -39,6 +41,22 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
         super(connectionProvider);
     }
 
+    @Override
+    public DaoResult<Integer> getPostCount() {
+        try (Connection conn = connectionProvider.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(SQL_GET_COUNT)) {
+
+                try (ResultSet result = stmt.executeQuery()) {
+                    result.next();
+                    int count = result.getInt(1);
+
+                    return DaoResult.succeed(DaoResult.Action.READ, count);
+                }
+            } catch (Exception e) {
+                return DaoResult.fail(DaoResult.Action.READ, e);
+            }
+    }
+    
     /*
      * (non-Javadoc)
      *
@@ -65,11 +83,32 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
     @Override
     public DaoResult<List<Post>> getPosts(int count) {
         try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_GET_RECENT)) {
+            PreparedStatement stmt = conn.prepareStatement(SQL_GET_RECENT)) {
             stmt.setInt(1, count);
 
             try (ResultSet result = stmt.executeQuery()) {
                 List<Post> posts = new ArrayList<Post>(count);
+
+                while (result.next()) {
+                    posts.add(getPostFromResultSet(result, true));
+                }
+
+                return DaoResult.succeed(DaoResult.Action.READ, posts);
+            }
+        } catch (Exception e) {
+            return DaoResult.fail(DaoResult.Action.READ, e);
+        }
+    }
+    
+    @Override
+    public DaoResult<List<Post>> getPosts(int Start, int ViewCount) {
+        try (Connection conn = connectionProvider.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(SQL_GET_PAGING)) {
+            stmt.setInt(1, Start);
+            stmt.setInt(2, ViewCount);
+            
+            try (ResultSet result = stmt.executeQuery()) {
+                List<Post> posts = new ArrayList<Post>();
 
                 while (result.next()) {
                     posts.add(getPostFromResultSet(result, true));

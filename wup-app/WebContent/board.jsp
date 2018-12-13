@@ -36,23 +36,22 @@
 					<c:forEach items="${postlist}" var="post">
 						<tr>
 							<td colspan="3">
-							<div class="Post">
+							<div class="Post" data-post-id="${post.id}">
 								<div class="summary">
 									<fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd"/> &nbsp;&nbsp;
-									<a href="#" onclick="expandToggle(${post.id})">${post.title}</a> &nbsp;&nbsp;
+									<a class="expandPost" href="#">${post.title}</a> &nbsp;&nbsp;
 									${post.owner.getNickname()} &nbsp;&nbsp;
 								</div>
-								<div class="expand" id="expand-${post.id}" style="display:none;">
-									<div id = "Media">
-								    <div id="Image">
-								    	<img alt="" src=""></img>
-								    </div>
-								    <div id="Text">
-								    <p>
-								    	${post.getText()}
-								    </p>
-								    </div>
-								    
+								<div class="expand" style="display:none;">
+									<div id="Media">
+									    <div id="Image">
+									    	<img alt="" src=""></img>
+									    </div>
+									    <div id="Text">
+									    <p>
+									    	${post.getText()}
+									    </p>
+									    </div>
 									</div>
 							
 									<div id = "Like">
@@ -61,11 +60,11 @@
 										</button>
 									</div>
 									<div class = "Comment">
-										<div id = "CommentList-${post.id}">
+										<div class="CommentList">
 										</div>
-										<div id="CommentInput">
-											<textarea id="ContentArea" placeholder="댓글을 입력하세요."></textarea>
-											<button id="CommentSubmitButton" type="submit" onclick="createComment(${post.id})">댓글달기</button>
+										<div class="CommentInput">
+											<textarea class="ContentArea" placeholder="댓글을 입력하세요."></textarea>
+											<button class="CommentSubmitButton" type="submit">댓글달기</button>
 										</div>
 									</div>
 								</div>
@@ -90,29 +89,58 @@
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script type="text/javascript">
 
-var loadedList = new Array();
+let loadedList = new Array();
+
+window.onload = function () {
+	let elements = document.getElementsByClassName("Post");
+	
+	for (let e of elements) {
+		for (let el of e.getElementsByClassName("expandPost")) {
+			el.addEventListener("click", event => {
+				expandToggle(e.getAttribute("data-post-id"));
+			});
+		}
+		
+		for (let el of e.getElementsByClassName("CommentSubmitButton")) {
+			el.addEventListener("click", event => {
+				createComment(e.getAttribute("data-post-id"));
+			});
+		}
+	}
+};
+
+function selectElement(id, elementName) {
+	let elements = document.getElementsByClassName("Post");
+	for (let e of elements) {
+		if(e.getAttribute("data-post-id") == id) {
+			return e.getElementsByClassName(elementName)[0];
+		}
+	}
+	return null;
+}
 
 function expandToggle(id) {
-	var x = document.getElementById("expand-"+ id);
-	if (x.style.display === "none") {
+	let e = selectElement(id, "expand");
+	if (e.style.display == "none") {
 		if(loadedList.indexOf(id) == -1) {
 			requestGetAjax(id);
 			loadedList.push(id);
 		}
-		x.style.display = "block";
+		e.style.display = "block";
 	} 
 	else {
-		x.style.display = "none";
+		e.style.display = "none";
 	}
 }
 
 function createComment(id){
-	console.log($("#ContentArea").val());
-	if($("#ContentArea").val() != "") {
-		console.log("안빔");
+	let e = selectElement(id, "ContentArea");
+
+	if(e.val() != "") {
+		requestPostAjax(id);
 	}
 	else {
-		console.log("빔");
+		alert("댓글을 입력해 주세요.");
 	}
 }
 
@@ -146,7 +174,6 @@ function requestGetAjax(id) {
 }
 
 function requestPostAjax(id) {
-	var post = "${post}";
 	$.ajaxSetup({
 	    type:"POST",
 	    async:true,
@@ -160,7 +187,7 @@ function requestPostAjax(id) {
 	    url:"${pageContext.request.contextPath}"+"/comment/",
 	    data:{
 	    	content:$("#ContentArea").val(),
-	    	post:post
+	    	postnum:id
 	    },
 	    beforeSend:function() {
 	        console.log("읽어오기 시작 전...");
@@ -169,26 +196,27 @@ function requestPostAjax(id) {
 	        console.log("읽어오기 완료 후...");
 	    },
 	    success:function(data) {
-	        console.log("comment를 정상적으로 추가하였습니다.");
-			
+	        console.log("comment를 정상적으로 추가하였습니다.");	
 	    }
 	});
 }
 
 function showComments(item, id){
     var comments = JSON.parse(item);
-    if(comments.length < 1) {
-		$("#CommentList-" + id).append("댓글이 없습니다.");
-		$("#CommentList-" + id).append("<br>");
+    let e = selectElement(id, "CommentList");
+    
+ 	if(comments.length < 1) {
+		$(e).append("댓글이 없습니다.");
+		$(e).append("<br>");
     }
     else {
         comments.forEach(function(value) {
-        	$("#CommentList-" + id).append(value["createdAt"]);
-        	$("#CommentList-" + id).append("&nbsp;&nbsp;");
-        	$("#CommentList-" + id).append(value["user"].nickname);
-        	$("#CommentList-" + id).append("&nbsp;&nbsp;");
-    		$("#CommentList-" + id).append(value["text"]);
-    		$("#CommentList-" + id).append("<br>");
+        	$(e).append(value["createdAt"]);
+        	$(e).append("&nbsp;&nbsp;");
+        	$(e).append(value["user"].nickname);
+        	$(e).append("&nbsp;&nbsp;");
+    		$(e).append(value["text"]);
+    		$(e).append("<br>");
         });
     }
 }

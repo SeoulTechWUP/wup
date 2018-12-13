@@ -20,7 +20,7 @@ import wup.data.User;
 /**
  * MariaDB를 통해 공개 게시물 정보에 접근하는 DAO입니다.
  *
- * @author Eunbin Jeong
+ * @author Eunbin Jeong, Won Hyun
  */
 public class MariaDbPostDao extends MariaDbDao implements PostDao {
 

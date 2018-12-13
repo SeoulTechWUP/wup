@@ -18,7 +18,6 @@ public interface CommentDao {
      * @param id 댓글의 일련번호
      */
     public DaoResult<Comment> getComment(int id);
-    //
     /**
      * 주어진 <code>post</code>에 작성된 모든 댓글의 리스트를 가져옵니다.
      *

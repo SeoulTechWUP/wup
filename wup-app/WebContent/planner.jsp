@@ -7,11 +7,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="wup" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="planner" class="wup.data.Planner" scope="request" />
-<%
-    List<Schedule> schedules = (List<Schedule>)request.getAttribute("schedules");
-    Iterator<Schedule> leftIterator = schedules.iterator();
-    Iterator<Schedule> rightIterator = schedules.iterator();
-%>
 <c:choose>
     <c:when test="${currentMonth == 0}">
         <c:set var="prevMonth" value="12" />
@@ -90,32 +85,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="small">
-                                            <% Schedule leftCurrent = leftIterator.hasNext() ? leftIterator.next() : null; %>
-                                            <c:forEach begin="0" end="5" var="row">
-                                                <tr>
-                                                    <c:forEach begin="1" end="4" var="col">
-                                                        <c:set var="date" value="${row * 7 + col - startingWeekday + 1}" />
-                                                        <td><div><c:if test="${date >= 1 && date <= lastDate}">
-                                                            ${date}
-                                                            <%
-                                                            while (leftCurrent != null) {
-                                                                long date = (long)pageContext.getAttribute("date");
-                                                                int startDate = leftCurrent.getStartsAt().getDate(); // deprecated
-                                                                if (startDate > date) {
-                                                                    break;
-                                                                }
-                                                                if (startDate == date) {
-                                                            %>
-                                                                <br><%= leftCurrent.getTitle() %>
-                                                            <%
-                                                                }
-                                                                leftCurrent = leftIterator.hasNext() ? leftIterator.next() : null;
-                                                            }
-                                                            %>
-                                                        </c:if></div></td>
-                                                    </c:forEach>
-                                                </tr>
-                                            </c:forEach>
+                                            <wup:calendarView scheduleSource="${schedules}" startingWeekday="${startingWeekday}" lastDate="${lastDate}" weekdayFrom="1" weekdayTo="4" />
                                         </tbody>
                                     </table>
                                 </div>
@@ -138,33 +108,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="small">
-                                            <% Schedule rightCurrent = rightIterator.hasNext() ? rightIterator.next() : null; %>
-                                            <c:forEach begin="0" end="5" var="row">
-                                                <tr>
-                                                    <c:forEach begin="5" end="7" var="col">
-                                                        <c:set var="date" value="${row * 7 + col - startingWeekday + 1}" />
-                                                        <td><div><c:if test="${date >= 1 && date <= lastDate}">
-                                                            ${date}
-                                                            <%
-                                                            while (rightCurrent != null) {
-                                                                long date = (long)pageContext.getAttribute("date");
-                                                                int startDate = rightCurrent.getStartsAt().getDate(); // deprecated
-                                                                if (startDate > date) {
-                                                                    break;
-                                                                }
-                                                                if (startDate == date) {
-                                                            %>
-                                                                <br><%= rightCurrent.getTitle() %>
-                                                            <%
-                                                                }
-                                                                rightCurrent = rightIterator.hasNext() ? rightIterator.next() : null;
-                                                            }
-                                                            %>
-                                                        </c:if></div></td>
-                                                    </c:forEach>
-                                                    <td></td>
-                                                </tr>
-                                            </c:forEach>
+                                            <wup:calendarView scheduleSource="${schedules}" startingWeekday="${startingWeekday}" lastDate="${lastDate}" weekdayFrom="5" weekdayTo="7" rightPage="true" />
                                         </tbody>
                                     </table>
                                 </div>

@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import wup.data.Comment;
+import wup.data.Group;
 import wup.data.Media;
 import wup.data.Post;
 import wup.data.Schedule;
@@ -143,13 +144,25 @@ public class PostWriteServlet extends HttpServlet {
         post.setText(request.getParameter("content"));
         post.setSchedule(schedule);
         
-        DaoResult<Post> createPost = PostDao.createPost(user, post);
+        DaoResult<Post> createPost;
         
+        System.out.println(request.getParameter("ownertype"));
+        System.out.println(request.getParameter("ownerid"));
+        
+        if(request.getParameter("ownertype") == "USER") {
+            createPost = PostDao.createPost(user, post);
+        } else {
+            Group group = new Group();
+            group.setId(Integer.parseInt(request.getParameter("ownerid")));
+            createPost = PostDao.createPost(group, post);
+        }
+         
         if(createPost.didSucceed()) {
             response.getWriter().write(makeJSON(null, "success"));
             return;
         } else {
             response.getWriter().write(makeJSON(createPost.getException().getMessage(), "dbfail"));
+            System.out.println(createPost.getException().getMessage());
             return;
         }
 	}

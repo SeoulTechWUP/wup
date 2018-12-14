@@ -51,7 +51,14 @@
                                                     <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd" />
                                                     &nbsp;&nbsp;
                                                     <a class="expandPost" href="#">${post.title}</a> &nbsp;&nbsp;
-                                                    ${post.owner.getNickname()} &nbsp;&nbsp;
+                                                    <c:choose>
+                                                    	<c:when test="${post.getType() eq 'USER'}">
+                                                    		${post.owner.getNickname()} &nbsp;&nbsp;
+                                                    	</c:when>
+                                                    	<c:otherwise>
+                                                    		${post.owner.getName()} &nbsp;&nbsp;
+                                                    	</c:otherwise>
+                                                    </c:choose>  
                                                 </div>
                                                 <div class="expand" style="display:none;">
                                                     <div id="Media">
@@ -67,7 +74,7 @@
 
                                                     <div id="Like">
                                                         <button id="LikeButton">
-                                                            좋아요
+                                                        	좋아요
                                                         </button>
                                                     </div>
                                                     <div class="Comment">

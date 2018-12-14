@@ -43,7 +43,7 @@
 
 <body>
     <div id="app-main" class="app">
-        <wup:appHeader title="${planner.title}" href="#" />
+        <wup:appHeader title="${planner.title}" href="${pageContext.request.contextPath}/${planner.type eq 'USER' ? 'planners' : 'groups'}" />
         <main>
             <div id="planner-view">
                 <div class="mode-tabs">

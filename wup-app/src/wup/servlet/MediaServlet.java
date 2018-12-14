@@ -66,8 +66,6 @@ public class MediaServlet extends HttpServlet {
 	    //요청시에 받아올 post id 가 url에 붙어있음
 	    //성공 시에 media가 저장된 path를 반환
 	    
-	    request.setCharacterEncoding("UTF-8");
-	    response.setCharacterEncoding("UTF-8");
 	    response.setContentType("application/json");
 	    
         MariaDbDaoFactory daoFactory = new DaoFactory();

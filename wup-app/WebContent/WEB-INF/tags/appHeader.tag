@@ -1,9 +1,26 @@
 <%@ tag language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ attribute name="title" rtexprvalue="true" %>
+<%@ attribute name="href" rtexprvalue="true" %>
 <jsp:useBean id="authenticatedUser" class="wup.data.User" scope="session" />
+<c:choose>
+    <c:when test="${title == null}">
+        <c:set var="titleText" value="WUP &mdash; What's Your Plan?" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="titleText" value="${title}" />
+    </c:otherwise>
+</c:choose>
 <header>
     <div id="app-title">
-        <span>WUP &mdash; What's Your Plan?</span>
+        <c:choose>
+            <c:when test="${href != null}">
+                <a href="${href}"><span><span class="icon arrow left"></span>&nbsp; ${titleText}</span></a>
+            </c:when>
+            <c:otherwise>
+                <span>${titleText}</span>
+            </c:otherwise>
+        </c:choose>
     </div>
     <div>
         <c:choose>

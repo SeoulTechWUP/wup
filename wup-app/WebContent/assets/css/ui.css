@@ -10,7 +10,7 @@
   display: inline-block;
   width: 8px;
   height: 16px;
-  background-image: url('/assets/images/icon_arrows.svg');
+  background-image: url('../images/icon_arrows.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }

@@ -9,29 +9,24 @@
 <title>WUP!</title>
 </head>
 <body>
-	<div class="postWriteForm">
-		<div class="titleinput">
-			<label>제목 : </label>
-			<input name="title" type="text">
-		</div>
-		<div class="scheduleinfo">
-			
-		</div>
-		<div class="postcontent" contentEditable="true">
-			
-		</div>
-		<div class="fileinput">
-		<form enctype="multipart/form-data">
-			<input id="image-file" type="file"/>
-		</form>
-		<form enctype="multipart/form-data">
-			<input id="video-file" type="file"/>
-		</form>
-		</div>
-		<div class="button">
-			<input id="submit" type="submit" value="게시하기">
-			<input id="abort" type="reset" value="취소">
-		</div>
+	<div class="titleinput">
+		<label>제목 : </label>
+		<input id="title" type="text" value="${schedule.title}">
+	</div>
+	<div class="scheduleinfo">
+		<label>일정 : </label>${schedule.startsAt} ~ ${schedule.endsAt} <br>
+		<label>장소 : </label>${schedule.location}
+	</div>
+	<div class="media">
+	</div>
+	<textarea id="content">${schedule.description}</textarea>
+	<div class="fileinput">
+		<input id="image-file" type="file"/>
+		<input id="video-file" type="file"/>
+	</div>
+	<div class="button">
+		<input id="submit" type="button" value="게시하기">
+		<input id="abort" type="button" value="취소">
 	</div>
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script type="text/javascript">
@@ -60,6 +55,7 @@ function AjaxMediaUpload(type) {
 	
 	$.ajax({
 	    url:context + "/media/" + type,
+	    enctype: "multipart/form-data",
 	    complete:function() {
 	        console.log("읽어오기 완료 후...");
 	    },
@@ -84,9 +80,67 @@ function AjaxMediaUpload(type) {
 	});
 }
 
+function AjaxPostRequest(title, content) {
+	$.ajaxSetup({
+	    type:"POST",
+	    async:true,
+	    dataType:"json",
+	    error:function(xhr) {
+	        console.log("error html = " + xhr.statusText);
+	    }
+	});
+	
+	$.ajax({
+	    url:context + "/postwrite/",
+	    data:{
+	    	scheduleid: "${schedule.getId()}",
+	    	ownerid:"${schedule.getPlanner().getOwner().getId()}",
+	    	ownertype:"${schedule.getPlanner().getType()}",
+	    	title: title,
+	    	content: content
+	    },
+	    complete:function() {
+	        console.log("읽어오기 완료 후...");
+	    },
+	    success:function(data) {
+	    	$.each(data, function(idx, item){
+	            if(data["result"] == "success") {
+	            	alert("정상적으로 게시하였습니다.");
+	            	window.location.href = context + "/board/1";
+	            	return false;
+	            }
+	            else if(data["result"] == "userfail"){
+	            	alert("로그인 세션이 만료되었습니다.");
+	            	window.location.href = context + "/login.jsp";
+	            	return false;
+	            }
+	            else if(data["result"] == "dbfail"){
+	            	console.log("post db 추가 접근 에러");
+	            	alert("db error : " + data["data"]);
+	            	return false;
+	            }
+	        });
+	    }
+	});
+}
+
+function upload(type) {
+	
+}
+
 function submit() {
 	if(confirm("글을 게시 하시겠습니까?")){
-		//TODO
+		if($("#content").val() == ""){
+		    alert("내용을 입력해 주세요.");
+		    $("#content").focus();
+		} 
+		else if($("#title").val() == "") {
+		    alert("제목을 입력해 주세요.");
+		    $("#title").focus();
+		}
+		else {
+			AjaxPostRequest($("#title").val(), $("#content").val());
+		}
 	}
 }
 

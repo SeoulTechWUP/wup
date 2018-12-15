@@ -142,33 +142,34 @@ function AjaxPostRequest(title, content) {
 }
 
 function upload(input,type) {
-	if(type == "image") {
-	    if (input.files && input.files[0]) {
-	    	for(var i = 0; i < input.files.length; i++) {
-		        var reader = new FileReader();
-		 		
-		        reader.addEventListener("load", event => {
-		        	$('.media').append("<div style=\" display:inline-block; \" >");
-		            $('.media').append("<img width=200px src=\" " + event.target.result + " \"></img>");
-		            $('.media').append("</div>");
-		        });
-		        reader.readAsDataURL(input.files[i]);
-	    	}
-	    }
-	} else {
-	    if (input.files && input.files[0]) {
-	    	for(var i = 0; i < input.files.length; i++) {
-		        var reader = new FileReader();
-		 		
-		        reader.addEventListener("load", event => {
-		        	$('.media').append("<div>");
-		            $('.media').append("<video width=200px src=\" " + event.target.result + " \" autoplay muted loop></video>");
-		            $('.media').append("</div>");
-		        });
-		        reader.readAsDataURL(input.files[i]);
-	    	}
-	    }
-	}
+    if (input.files && input.files[0]) {
+    	for(var i = 0; i < input.files.length; i++) {
+	        var reader = new FileReader();
+	 		
+	        reader.addEventListener("load", event => {
+	        	var button = document.createElement("input");
+	        	button.type = "button";
+	        	button.id = "cancel";
+	        	button.value = "x";
+	        	
+	        	var string = "<div class=\"mediaElement\" style=\"display:inline-block;\" >";
+
+	        	if(type == "image") {
+	        		string += "<img width=300px src=\" " + event.target.result + " \"></img>";
+	        	} else {
+	        		string += "<video width=300px src=\" " + event.target.result + " \" autoplay muted loop></video>";
+	        	}
+	            $('.media').append(string);
+	            
+	            $('.media div:last-child').append(button);
+	            
+	        	button.addEventListener("click", e => {
+	        		$(e.target).closest("div").remove();
+	        	});
+	        });
+	        reader.readAsDataURL(input.files[i]);
+    	}
+    }
 }
 
 function submit() {

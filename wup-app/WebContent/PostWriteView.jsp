@@ -9,20 +9,24 @@
 <title>WUP!</title>
 </head>
 <body>
-	<div class="titleinput">
+	<div class="titleInput">
 		<label>제목 : </label>
 		<input id="title" type="text" value="${schedule.title}">
 	</div>
-	<div class="scheduleinfo">
+	<div class="scheduleInfo">
 		<label>일정 : </label>${schedule.startsAt} ~ ${schedule.endsAt} <br>
 		<label>장소 : </label>${schedule.location}
 	</div>
-	<div class="media">
+	<div class="media" style="width:50%;overflow:auto;overflow-y:hidden;white-space: nowrap;">
 	</div>
-	<textarea id="content">${schedule.description}</textarea>
-	<div class="fileinput">
-		<input id="image-file" type="file"/>
-		<input id="video-file" type="file"/>
+	<div class="textContent">
+		<textarea id="content">${schedule.description}</textarea>
+	</div>
+	<div class="fileInput">
+		<input id="imageBtn" type="button" value="사진 추가">
+		<input id="videoBtn" type="button" value="영상 추가">
+		<input id="image-file" multiple="multiple" type="file" accept="image/*" style="display:none;"/>
+		<input id="video-file" multiple="multiple" type="file" accept="video/*" style="display:none;"/>
 	</div>
 	<div class="button">
 		<input id="submit" type="button" value="게시하기">
@@ -32,8 +36,26 @@
 <script type="text/javascript">
 
 var context = "${pageContext.request.contextPath}";
+var imageFiles = [];
+var videoFiles = [];
 
 window.onload = function () {
+	document.getElementById("imageBtn").addEventListener("click", event => {
+		document.getElementById("image-file").click();
+	});
+	
+	document.getElementById("videoBtn").addEventListener("click", event => {
+		document.getElementById("video-file").click();
+	});
+	
+	document.getElementById("image-file").addEventListener("change", event => {
+		upload(document.getElementById("image-file"),"image");
+	});
+	
+	document.getElementById("video-file").addEventListener("change", event => {
+		upload(document.getElementById("video-file"),"video");
+	});
+	
 	document.getElementById("submit").addEventListener("click", event => {
 		submit();
 	});
@@ -43,7 +65,7 @@ window.onload = function () {
 	});
 };
 
-function AjaxMediaUpload(type) {
+function AjaxMediaUpload(id, type) {
 	$.ajaxSetup({
 	    type:"POST",
 	    async:true,
@@ -62,16 +84,11 @@ function AjaxMediaUpload(type) {
 	    success:function(data) {
 	    	$.each(data, function(idx, item){
 	            if(data["result"] == "success" && idx == "data") {
-	            	console.log("comment를 정상적으로 추가하였습니다.");
-	            	return false;
-	            }
-	            else if(data["result"] == "userfail"){
-	            	alert("로그인 후에 댓글을 작성하실 수 있습니다.");
-	            	window.location.href = context + "/login.jsp";
-	            	return false;
+	            	console.log(type + "를 정상적으로 추가하였습니다.");
+	            	return true;
 	            }
 	            else if(data["result"] == "dbfail"){
-	            	console.log("comment db 추가 접근 에러");
+	            	console.log("media db 추가 접근 에러");
 	            	alert("db error : " + data["data"]);
 	            	return false;
 	            }
@@ -104,7 +121,7 @@ function AjaxPostRequest(title, content) {
 	    },
 	    success:function(data) {
 	    	$.each(data, function(idx, item){
-	            if(data["result"] == "success") {
+	            if(data["result"] == "success" && idx == "data") {
 	            	alert("정상적으로 게시하였습니다.");
 	            	window.location.href = context + "/board/1";
 	            	return false;
@@ -124,8 +141,34 @@ function AjaxPostRequest(title, content) {
 	});
 }
 
-function upload(type) {
-	
+function upload(input,type) {
+	if(type == "image") {
+	    if (input.files && input.files[0]) {
+	    	for(var i = 0; i < input.files.length; i++) {
+		        var reader = new FileReader();
+		 		
+		        reader.addEventListener("load", event => {
+		        	$('.media').append("<div style=\" display:inline-block; \" >");
+		            $('.media').append("<img width=200px src=\" " + event.target.result + " \"></img>");
+		            $('.media').append("</div>");
+		        });
+		        reader.readAsDataURL(input.files[i]);
+	    	}
+	    }
+	} else {
+	    if (input.files && input.files[0]) {
+	    	for(var i = 0; i < input.files.length; i++) {
+		        var reader = new FileReader();
+		 		
+		        reader.addEventListener("load", event => {
+		        	$('.media').append("<div>");
+		            $('.media').append("<video width=200px src=\" " + event.target.result + " \" autoplay muted loop></video>");
+		            $('.media').append("</div>");
+		        });
+		        reader.readAsDataURL(input.files[i]);
+	    	}
+	    }
+	}
 }
 
 function submit() {

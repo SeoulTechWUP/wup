@@ -139,7 +139,7 @@ function AjaxMediaUpload(id, type) {
 	            	return false;
 	            }
 	            else if(data["result"] == "uploadfail"){
-	            	console.log("upload 파일 에러);
+	            	console.log("upload 파일 에러");
 	            	alert("upload error : " + data["data"]);
 	            	return false;
 	            }

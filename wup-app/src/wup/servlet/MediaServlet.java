@@ -157,10 +157,7 @@ public class MediaServlet extends HttpServlet {
 	    
 	    for (File temp : fileList) {
 	        String tempPath = temp.getParent() + temp.getName();
-	        System.out.println("before : "+tempPath);
-	        tempPath = tempPath.replace('\\', '/');
-	        System.out.println("after : "+tempPath);
-	        tempMedia.setPath(tempPath);
+	        tempMedia.setPath(tempPath.replace('\\', '/'));
 	        createMedia = MediaDao.createMedia(tempPost, tempMedia);
 	        
 	        if(!createMedia.didSucceed()) {

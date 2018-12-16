@@ -62,16 +62,12 @@
                                                 </div>
                                                 <div class="expand" style="display:none;">
                                                     <div id="Media">
-                                                        <div id="Image">
-                                                            <img alt="" src=""></img>
-                                                        </div>
-                                                        <div id="Text">
-                                                            <p>
-                                                                ${post.getText()}
-                                                            </p>
-                                                        </div>
                                                     </div>
-
+                                                    <div id="Text">
+                                                        <p>
+                                                            ${post.getText()}
+                                                        </p>
+                                                    </div>
                                                     <div id="Like">
                                                         <button id="LikeButton">
                                                         	좋아요
@@ -146,7 +142,7 @@
             let e = selectElement(id, "expand");
             if (e.style.display == "none") {
                 if (loadedList.indexOf(id) == -1) {
-                    requestGetAjax(id);
+                    AjaxGetComments(id);
                     loadedList.push(id);
                 }
                 e.style.display = "block";
@@ -160,7 +156,7 @@
             let e = selectElement(id, "ContentArea");
 
             if ($(e).val() != "") {
-                requestPostAjax(id, $(e).val());
+            	AjaxPostComments(id, $(e).val());
                 e.value = "";
             }
             else {
@@ -168,7 +164,7 @@
             }
         }
 
-        function requestGetAjax(id) {
+        function AjaxGetComments(id) {
             $.ajaxSetup({
                 type: "GET",
                 async: true,
@@ -180,8 +176,8 @@
 
             $.ajax({
                 url: context + "/comment/" + id,
-                complete: function () {
-                    console.log("읽어오기 완료 후...");
+                beforeSend: function () {
+                    console.log("읽어오기 전...");
                 },
                 success: function (data) {
                     $.each(data, function (idx, item) {
@@ -199,7 +195,7 @@
             });
         }
 
-        function requestPostAjax(id, content) {
+        function AjaxPostComments(id, content) {
             $.ajaxSetup({
                 type: "POST",
                 async: true,
@@ -215,14 +211,14 @@
                     content: content,
                     postnum: id
                 },
-                complete: function () {
-                    console.log("읽어오기 완료 후...");
+                beforeSend: function () {
+                    console.log("읽어오기 전...");
                 },
                 success: function (data) {
                     $.each(data, function (idx, item) {
                         if (data["result"] == "success" && idx == "data") {
                             console.log("comment를 정상적으로 추가하였습니다.");
-                            requestGetAjax(id);
+                            AjaxGetComments(id);
                             return false;
                         }
                         else if (data["result"] == "userfail") {
@@ -240,8 +236,22 @@
             });
         }
 
+        function showMedia(item, id) {
+            let media = JSON.parse(item);
+            let e = selectElement(id, "Media");
+            
+            media.forEach(function (value) {
+            	if (value["type"] == "IMAGE") {
+            		$(e).append("<img width=\"300px\" src=\"file://\"" + value["path"] + ">");
+            	} else {
+            		$(e).append("<video width=\"300px\" src=\"file://\"" + value["path"] + ">");
+            	}
+            });
+
+        }
+        
         function showComments(item, id) {
-            var comments = JSON.parse(item);
+            let comments = JSON.parse(item);
             let e = selectElement(id, "CommentList");
             $(e).empty();
 

@@ -76,9 +76,6 @@ public class MediaServlet extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 	        throws ServletException, IOException {
-	    //post 로딩시에 media 요청
-	    //요청시에 받아올 post id 가 url에 붙어있음
-	    //성공 시에 media가 저장된 path를 반환
 	    
 	    response.setContentType("application/json");
 	    
@@ -86,25 +83,30 @@ public class MediaServlet extends HttpServlet {
         MediaDao MediaDao = (MediaDao) daoFactory.getDao(Media.class);
         
         DaoResult<List<Media>> getMedia;
-        List<Media> Media = new ArrayList<Media>();
+        
+        Post post = new Post();
         
         int postNum = ValidatePath(ServletHelper.trimString(request.getPathInfo()));
-        
-        if (postNum > 0) {
             
+        if (postNum < 0) {
+            response.getWriter().write(makeJSON(null, "pathfail"));
+            return;
+        } 
+        
+        post.setId(postNum);
+        getMedia = MediaDao.getMedia(post);
+        
+        if(getMedia.didSucceed()) {
+            response.getWriter().write(makeJSON(getMedia.getData(), "success"));
         } else {
-            //경로가 정확하지 않음
-            request.setAttribute("GetMediaErrorMessage", "Wrong Path: " + request.getPathInfo());
-            System.out.println("Wrong Path: " + request.getPathInfo());
+            response.getWriter().write(makeJSON(getMedia.getException().getMessage(), "dbfail"));
             return;
         }
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	        throws ServletException, IOException {
-	    //post 작성시에 media 삽입
-	    //요청시에 data에 media 타입이 명시되어 있음
-	    //성공 시에 media가 저장된 path를 반환
+	    
 	    response.setContentType("application/json");
 	    
         MariaDbDaoFactory daoFactory = new DaoFactory();

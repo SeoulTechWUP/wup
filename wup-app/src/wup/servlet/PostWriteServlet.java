@@ -18,13 +18,11 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import wup.data.Comment;
 import wup.data.Group;
 import wup.data.Media;
 import wup.data.Post;
 import wup.data.Schedule;
 import wup.data.User;
-import wup.data.access.CommentDao;
 import wup.data.access.DaoFactory;
 import wup.data.access.DaoResult;
 import wup.data.access.MariaDbDaoFactory;
@@ -146,9 +144,6 @@ public class PostWriteServlet extends HttpServlet {
         
         DaoResult<Post> createPost;
         
-        System.out.println(request.getParameter("ownertype"));
-        System.out.println(request.getParameter("ownerid"));
-        
         if(request.getParameter("ownertype") == "USER") {
             createPost = PostDao.createPost(user, post);
         } else {
@@ -158,11 +153,10 @@ public class PostWriteServlet extends HttpServlet {
         }
          
         if(createPost.didSucceed()) {
-            response.getWriter().write(makeJSON(null, "success"));
+            response.getWriter().write(makeJSON(createPost.getData(), "success"));
             return;
         } else {
             response.getWriter().write(makeJSON(createPost.getException().getMessage(), "dbfail"));
-            System.out.println(createPost.getException().getMessage());
             return;
         }
 	}

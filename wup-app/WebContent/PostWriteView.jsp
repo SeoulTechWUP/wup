@@ -90,7 +90,7 @@ function MakeFormdata(type) {
 		if(nameArr.length == 0) {return null;}
 		for(let i = 0; i<imageFiles.length; i++) {
 			if(nameArr.indexOf(imageFiles[i].name) != -1){
-				filedata.append("file",imageFiles[i]);
+				filedata.append("file", imageFiles[i]);
 			}
 		}
 	} else {
@@ -104,7 +104,7 @@ function MakeFormdata(type) {
 		if(nameArr.length == 0) {return null;}
 		for(let i = 0; i<videoFiles.length; i++) {
 			if(nameArr.indexOf(videoFiles[i].name) != -1){
-				filedata.append("file",videoFiles[i]);
+				filedata.append("file", videoFiles[i]);
 			}
 		}
 	}

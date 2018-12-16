@@ -427,6 +427,13 @@ body {
   transform: translate(0, 1px);
 }
 
+#planner-view .schedule-list-item a:link,
+#planner-view .schedule-list-item a:visited,
+#planner-view .schedule-list-item a:active {
+  color: #333;
+  text-decoration: none;
+}
+
 /********************/
 /* SCHEDULE DETAILS */
 /********************/

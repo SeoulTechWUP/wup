@@ -26,8 +26,11 @@ Schedule current = iterator.hasNext() ? iterator.next() : null;
                         break;
                     }
                     if (startDate == date) {
+                        jspContext.setAttribute("schedule", current);
                 %>
-                    <br><%= current.getTitle() %>
+                    <div class="schedule-list-item">
+                        <a href="<c:url value="/schedule/${schedule.id}" />">${schedule.title}</a>
+                    </div>
                 <%
                     }
                     current = iterator.hasNext() ? iterator.next() : null;

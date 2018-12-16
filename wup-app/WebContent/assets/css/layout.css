@@ -431,68 +431,57 @@ body {
 /* SCHEDULE DETAILS */
 /********************/
 
-#schedule-details {
+#schedule-info {
   display: inline-block;
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
   background-color: whitesmoke;
 }
 
-#schedule-details form {
+#schedule-info table {
   width: 100%;
-  height: 100%;
 }
 
-#schedule-details table {
-  width: 100%;
-  height: 100%;
-}
-
-#schedule-details table tbody {
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-direction: column;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-}
-
-#schedule-details table tr {
+#schedule-info table tr {
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
   align-items: center;
 }
 
-#schedule-details table th {
+#schedule-info table th {
   box-sizing: border-box;
   padding: 0.25em;
   width: 100px;
   text-align: right;
 }
 
-#schedule-details table td {
+#schedule-info table td {
   -webkit-flex: 1;
   flex: 1;
   padding: 0.25em;
 }
 
-#schedule-details table tr.fill {
-  -webkit-flex: 1;
-  flex: 1;
-}
-
-#schedule-details table tr.fill th,
-#schedule-details table tr.fill td {
-  height: 100%;
-}
-
-#schedule-details table input[type=text] {
+#schedule-info table input[type=text] {
   width: 100%;
 }
 
-#schedule-details table textarea {
+#schedule-description {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+#schedule-description > div {
+  margin: 0.25em;
+}
+
+#schedule-description .textarea {
+  flex: 1;
+}
+
+#schedule-description .textarea textarea {
   width: 100%;
   height: 100%;
 }

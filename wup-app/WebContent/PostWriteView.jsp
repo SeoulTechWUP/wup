@@ -138,6 +138,11 @@ function AjaxMediaUpload(id, type) {
 	            	console.log(type + "를 정상적으로 추가하였습니다.");
 	            	return false;
 	            }
+	            else if(data["result"] == "uploadfail"){
+	            	console.log("upload 파일 에러);
+	            	alert("upload error : " + data["data"]);
+	            	return false;
+	            }
 	            else if(data["result"] == "dbfail"){
 	            	console.log("media db 추가 접근 에러");
 	            	alert("db error : " + data["data"]);

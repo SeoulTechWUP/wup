@@ -3,6 +3,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="wup" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="schedule" class="wup.data.Schedule" scope="request" />
+<jsp:useBean id="now" class="java.util.Date" />
+<c:set var="startsAt" value="${schedule.startsAt == null ? now : schedule.startsAt}" />
+<c:set var="endsAt" value="${schedule.endsAt == null ? now : schedule.endsAt}" />
 <!DOCTYPE html>
 <html>
 
@@ -31,25 +34,24 @@
                                                 <tbody>
                                                     <tr>
                                                         <th>제목</th>
-                                                        <td><input name="title" type="text"></td>
+                                                        <td><input name="title" type="text" value="${schedule.title}" required></td>
                                                     </tr>
                                                     <tr>
                                                         <th>장소</th>
-                                                        <td><input name="location" type="text"></td>
+                                                        <td><input name="location" type="text" value="${schedule.location}"></td>
                                                     </tr>
                                                     <tr>
                                                         <th>시작 일시</th>
                                                         <td class="start-date-picker">
                                                             <span>
-                                                                <input name="year" type="number" min="0" max="9999"
-                                                                    style="width: 80px">
+                                                                <input name="start_year" type="number" min="0" max="9999" value="${startsAt.year + 1900}" required style="width: 80px">
                                                                 /
-                                                                <input name="month" type="number" min="1" max="12"
-                                                                    style="width: 60px">
+                                                                <input name="start_month" type="number" min="1" max="12" value="${startsAt.month + 1}" required style="width: 60px">
                                                                 /
-                                                                <input name="date" type="number" min="1" max="31" style="width: 60px">
-                                                                <select name="hour"></select> :
-                                                                <select name="minute"></select>
+                                                                <input name="start_date" type="number" min="1" max="31" value="${startsAt.date}" required style="width: 60px">
+                                                                <input name="start_hour" type="number" min="0" max="23" value="${startsAt.hours}" required style="width:60px">
+                                                                :
+                                                                <input name="start_minute" type="number" min="0" max="59" value="${startsAt.minutes}" required style="width:60px">
                                                             </span>
                                                         </td>
                                                     </tr>
@@ -57,7 +59,7 @@
                                                         <th>&nbsp;</th>
                                                         <td>
                                                             <label class="cb-container">
-                                                                <input name="allday" type="checkbox">
+                                                                <input name="allday" type="checkbox" ${schedule.allDay ? 'checked' : ''}>
                                                                 <div></div>
                                                                 <span>하루 종일</span>
                                                             </label>
@@ -67,15 +69,14 @@
                                                         <th>종료 일시</th>
                                                         <td class="end-date-picker">
                                                             <span>
-                                                                <input name="year" type="number" min="0" max="9999"
-                                                                    style="width: 80px">
+                                                                <input name="end_year" type="number" min="0" max="9999" value="${endsAt.year + 1900}" required style="width: 80px">
                                                                 /
-                                                                <input name="month" type="number" min="1" max="12"
-                                                                    style="width: 60px">
+                                                                <input name="end_month" type="number" min="1" max="12" value="${endsAt.month + 1}" required style="width: 60px">
                                                                 /
-                                                                <input name="date" type="number" min="1" max="31" style="width: 60px">
-                                                                <select name="hour"></select> :
-                                                                <select name="minute"></select>
+                                                                <input name="end_date" type="number" min="1" max="31" value="${endsAt.date}" required style="width: 60px">
+                                                                <input name="end_hour" type="number" min="0" max="23" value="${endsAt.hours}" required style="width:60px">
+                                                                :
+                                                                <input name="end_minute" type="number" min="0" max="59" value="${endsAt.minutes}" required style="width:60px">
                                                             </span>
                                                         </td>
                                                     </tr>
@@ -95,7 +96,7 @@
                                     <div class="main">
                                         <div id="schedule-description">
                                             <div class="textarea">
-                                                <textarea name="description"></textarea>
+                                                <textarea name="description">${schedule.description}</textarea>
                                             </div>
                                             <div style="text-align: center">
                                                 <button name="cancel" type="button">취소</button>

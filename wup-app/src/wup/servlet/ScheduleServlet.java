@@ -79,27 +79,4 @@ public class ScheduleServlet extends HttpServlet {
         request.getRequestDispatcher("/scheduleView.jsp").forward(request, response);
     }
 
-    /**
-     * @see HttpServlet#doPut(HttpServletRequest, HttpServletResponse)
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        User authenticatedUser = (User) request.getSession().getAttribute("authenticatedUser");
-
-        if (authenticatedUser == null || authenticatedUser.getEmail() == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-
-            return;
-        }
-
-        String pathInfo = request.getPathInfo();
-
-        if (pathInfo == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-
-            return;
-        }
-    }
-
 }

@@ -64,6 +64,10 @@
                                                     <div class="Media">
                                                     </div>
                                                     <div id="Text">
+														<div class="scheduleInfo">
+															<label>일정 : </label>${post.getSchedule().startsAt} ~ ${post.getSchedule().endsAt} <br>
+															<label>장소 : </label>${post.getSchedule().location}
+														</div>
                                                         <p>
                                                             ${post.getText()}
                                                         </p>

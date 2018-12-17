@@ -583,3 +583,49 @@ body {
   text-align: center;
   opacity: 0.5;
 }
+
+#post-writer {
+  display: flex;
+  flex-direction: column;
+  width: 800px;
+  height: 90%;
+}
+
+#post-writer .contents {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#post-writer .form-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#post-writer .form-item.fill {
+  flex: 1;
+}
+
+#post-writer .form-item label.header {
+  display: inline-block;
+  width: 80px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#post-writer .form-item label.header + * {
+  flex: 1;
+}
+
+#post-writer .form-item textarea {
+  width: 100%;
+  height: 100%;
+}
+
+#post-writer .media {
+  height: 100px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}

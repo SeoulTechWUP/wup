@@ -232,6 +232,16 @@
   box-shadow: none;
 }
 
+.app span.static-text {
+  display: inline-block;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.75);
+  box-sizing: border-box;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
 .app .modal {
   background-color: whitesmoke;
   border-radius: 0.5rem;

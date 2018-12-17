@@ -1,38 +1,65 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="wup" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="UTF-8">
-    <title>WUP!</title>
+    <title>일정 공유하기 | WUP</title>
+    <wup:includeAssets />
 </head>
 
 <body>
-    <div class="titleInput">
-        <label>제목 : </label>
-        <input id="title" type="text" value="${schedule.title}">
-    </div>
-    <div class="scheduleInfo">
-        <label>일정 : </label>${schedule.startsAt} ~ ${schedule.endsAt} <br>
-        <label>장소 : </label>${schedule.location}
-    </div>
-    <div class="media" style="width:50%;overflow:auto;overflow-y:hidden;white-space: nowrap;">
-    </div>
-    <div class="textContent">
-        <textarea id="content">${schedule.description}</textarea>
-    </div>
-    <div class="fileInput">
-        <input id="imageBtn" type="button" value="사진 추가">
-        <input id="videoBtn" type="button" value="영상 추가">
-        <input id="image-file" multiple="multiple" type="file" accept="image/*" style="display:none;" />
-        <input id="video-file" multiple="multiple" type="file" accept="video/*" style="display:none;" />
-    </div>
-    <div class="button">
-        <input id="submit" type="button" value="게시하기">
-        <input id="abort" type="button" value="취소">
+    <div id="app-main" class="app">
+        <wup:appHeader />
+        <main>
+            <div id="post-writer" class="modal">
+                <div class="top-tabs">
+                    <div class="tab active">일정 공유하기</div>
+                </div>
+                <div class="contents">
+                    <div class="form-item">
+                        <label class="header">제목</label>
+                        <input id="title" type="text" value="${schedule.title}">
+                    </div>
+                    <div class="form-item">
+                        <label class="header">일정</label>
+                        <span class="static-text">${schedule.startsAt} ~ ${schedule.endsAt}</span>
+                    </div>
+                    <div class="form-item">
+                        <label class="header">장소</label>
+                        <span class="static-text">${schedule.location}</span>
+                    </div>
+                    <div class="form-item">
+                        <label class="header">첨부</label>
+                        <div class="media"></div>
+                    </div>
+                    <div class="form-item">
+                        <label class="header">&nbsp;</label>
+                        <span>
+                            <button id="imageBtn" type="button">사진 추가</button>
+                            <button id="videoBtn" type="button">영상 추가</button>
+                            <input id="image-file" multiple="multiple" type="file" accept="image/*" style="display:none;" />
+                            <input id="video-file" multiple="multiple" type="file" accept="video/*" style="display:none;" />
+                        </span>
+                    </div>
+                    <div class="form-item fill">
+                        <textarea id="content">${schedule.description}</textarea>
+                    </div>
+                    <div class="form-item" style="display: block; text-align: center">
+                        <button id="submit" class="tinted" type="button">게시하기</button>
+                        <button id="abort" class="red" type="button">취소</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div id="dropdown-container" class="dropdown-container"></div>
+        <div id="modal-container" class="modal-container" style="display: none">
+            <div class="fader" style="opacity: 0"></div>
+            <div class="contents"></div>
+        </div>
     </div>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript">

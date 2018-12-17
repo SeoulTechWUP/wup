@@ -304,10 +304,11 @@
 	        		video.muted = true;
 	        		video.autoplay = true;
 	        		video.loop = true;
+	        		$(video).hover(function(){video.setAttribute("controls","controls");},
+	        			function(){video.removeAttribute("controls");});
             		$(e).append(video);
             	}
-            });
-
+			});
         }
         
         function showComments(item, id) {

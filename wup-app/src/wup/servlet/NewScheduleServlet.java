@@ -1,8 +1,6 @@
 package wup.servlet;
 
 import java.io.IOException;
-import java.util.GregorianCalendar;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -68,22 +66,14 @@ public class NewScheduleServlet extends HttpServlet {
             return;
         }
 
-        Map<String, String> strings = ScheduleHelper.getStringFields(request);
-        Map<String, Integer> numbers = ScheduleHelper.getNumberFields(request);
-
         Planner planner = new Planner();
-        Schedule schedule = new Schedule();
+        Schedule schedule = ScheduleHelper.getScheduleFromRequest(request);
 
-        planner.setId(numbers.get("plannerId"));
-
-        schedule.setTitle(strings.get("title"));
-        schedule.setLocation(strings.get("location"));
-        schedule.setStartsAt(new GregorianCalendar(numbers.get("start_year"), numbers.get("start_month") - 1,
-                numbers.get("start_date"), numbers.get("start_hour"), numbers.get("start_minute")).getTime());
-        schedule.setEndsAt(new GregorianCalendar(numbers.get("end_year"), numbers.get("end_month") - 1,
-                numbers.get("end_date"), numbers.get("end_hour"), numbers.get("end_minute")).getTime());
-        schedule.setAllDay(strings.get("allday").equals("on"));
-        schedule.setDescription(strings.get("description"));
+        try {
+            planner.setId(Integer.parseInt(request.getParameter("plannerId")));
+        } catch (NumberFormatException e) {
+            throw new ServletException(e);
+        }
 
         MariaDbDaoFactory daoFactory = new DaoFactory();
         ScheduleDao scheduleDao = (ScheduleDao) daoFactory.getDao(Schedule.class);

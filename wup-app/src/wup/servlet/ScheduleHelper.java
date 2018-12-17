@@ -1,6 +1,7 @@
 package wup.servlet;
 
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,17 +34,35 @@ class ScheduleHelper {
         };
 
         numberFields = new String[] {
-                "plannerId", "scheduleId", "start_year", "start_month", "start_date", "start_hour", "start_minute",
-                "end_year", "end_month", "end_date", "end_hour", "end_minute"
+                "start_year", "start_month", "start_date", "start_hour", "start_minute", "end_year", "end_month",
+                "end_date", "end_hour", "end_minute"
         };
     }
 
-    public static Map<String, String> getStringFields(HttpServletRequest request) {
+    public static Schedule getScheduleFromRequest(HttpServletRequest request) {
+        Map<String, String> strings = getStringFields(request);
+        Map<String, Integer> numbers = getNumberFields(request);
+
+        Schedule schedule = new Schedule();
+
+        schedule.setTitle(strings.get("title"));
+        schedule.setLocation(strings.get("location"));
+        schedule.setStartsAt(new GregorianCalendar(numbers.get("start_year"), numbers.get("start_month") - 1,
+                numbers.get("start_date"), numbers.get("start_hour"), numbers.get("start_minute")).getTime());
+        schedule.setEndsAt(new GregorianCalendar(numbers.get("end_year"), numbers.get("end_month") - 1,
+                numbers.get("end_date"), numbers.get("end_hour"), numbers.get("end_minute")).getTime());
+        schedule.setAllDay(strings.get("allday").equals("on"));
+        schedule.setDescription(strings.get("description"));
+
+        return schedule;
+    }
+
+    private static Map<String, String> getStringFields(HttpServletRequest request) {
         return Arrays.stream(stringFields)
                 .collect(Collectors.toMap(x -> x, x -> ServletHelper.trimString(request.getParameter(x))));
     }
 
-    public static Map<String, Integer> getNumberFields(HttpServletRequest request) {
+    private static Map<String, Integer> getNumberFields(HttpServletRequest request) {
         return Arrays.stream(numberFields).collect(Collectors.toMap(x -> x, x -> {
             try {
                 return Integer.parseInt(ServletHelper.trimString(request.getParameter(x)));

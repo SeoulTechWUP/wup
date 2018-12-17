@@ -120,7 +120,8 @@ public class MediaServlet extends HttpServlet {
         File[] fileList;
         
 	    MultipartRequest mul;
-	    String path = request.getSession().getServletContext().getRealPath("/media");
+	    String realPath = this.getServletContext().getRealPath("/res/");
+	    String path = "";
 	    
         String type = null;
         int post = -1;
@@ -140,7 +141,8 @@ public class MediaServlet extends HttpServlet {
             response.getWriter().write(makeJSON(null, "pathfail"));
         }
 	    
-        File dir = new File(path + "/" + post + "/" + type);
+        path = "/res/" + post + "/" + type + "/";
+        File dir = new File(realPath + post + "/" + type);
 	    
         if(!dir.isDirectory()) {
             dir.mkdirs();
@@ -158,8 +160,8 @@ public class MediaServlet extends HttpServlet {
 	    fileList = dir.listFiles();
 	    
 	    for (File temp : fileList) {
-	        String tempPath = temp.getParent() + temp.getName();
-	        tempMedia.setPath(tempPath.replace('\\', '/'));
+	        String tempPath = path + temp.getName();
+	        tempMedia.setPath(tempPath);
 	        createMedia = MediaDao.createMedia(tempPost, tempMedia);
 	        
 	        if(!createMedia.didSucceed()) {

@@ -11,7 +11,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>${schedule.title} | WUP</title>
+    <title>${mode eq 'new' ? '새로운 일정 추가' : schedule.title} | WUP</title>
     <wup:includeAssets />
 </head>
 
@@ -20,13 +20,22 @@
         <wup:appHeader />
         <main>
             <div id="planner-view">
-                <form style="height: 100%">
+                <c:choose>
+                    <c:when test="${mode eq 'new'}">
+                        <c:url var="formAction" value="/newSchedule" />
+                        <form method="post" action="${formAction}" style="height: 100%">
+                    </c:when>
+                    <c:otherwise>
+                        <form method="post" style="height: 100%">
+                    </c:otherwise>
+                </c:choose>
+                    <input type="hidden" name="plannerId" value="${plannerId}">
                     <div class="border">
                         <div class="left">
                             <div class="paper">
                                 <div class="contents">
                                     <header>
-                                        <h2>일정 편집</h2>
+                                        <h2>${mode eq 'new' ? '새로운 일정 추가' : '일정 보기 및 편집'}</h2>
                                     </header>
                                     <div class="main">
                                         <div id="schedule-info">
@@ -99,8 +108,10 @@
                                                 <textarea name="description">${schedule.description}</textarea>
                                             </div>
                                             <div style="text-align: center">
-                                                <button name="cancel" type="button">취소</button>
-                                                <button name="delete" type="button" class="red">일정 삭제</button>
+                                                <button id="cancelButton" type="button">취소</button>
+                                                <c:if test="${mode eq 'edit'}">
+                                                    <button name="delete" type="button" class="red">일정 삭제</button>
+                                                </c:if>
                                                 <input type="submit" class="tinted" value="저장"></button>
                                             </div>
                                         </div>
@@ -118,6 +129,15 @@
             <div class="contents"></div>
         </div>
     </div>
+    <script>
+    (function () {
+        let cancelButton = document.getElementById("cancelButton");
+
+        cancelButton.addEventListener("click", e => {
+            history.go(-1);
+        }, false);
+    })();
+    </script>
 </body>
 
 </html>

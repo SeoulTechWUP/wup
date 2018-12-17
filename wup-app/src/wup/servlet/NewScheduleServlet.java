@@ -1,10 +1,8 @@
 package wup.servlet;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,19 +24,6 @@ import wup.data.access.ScheduleDao;
 @WebServlet("/newSchedule")
 public class NewScheduleServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static final String[] stringFields;
-    private static final String[] numberFields;
-
-    static {
-        stringFields = new String[] {
-                "title", "location", "allday", "description"
-        };
-
-        numberFields = new String[] {
-                "plannerId", "start_year", "start_month", "start_date", "start_hour", "start_minute", "end_year",
-                "end_month", "end_date", "end_hour", "end_minute"
-        };
-    }
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -83,11 +68,8 @@ public class NewScheduleServlet extends HttpServlet {
             return;
         }
 
-        Map<String, String> strings = Arrays.stream(stringFields)
-                .collect(Collectors.toMap(name -> name, name -> ServletHelper.trimString(request.getParameter(name))));
-
-        Map<String, Integer> numbers = Arrays.stream(numberFields)
-                .collect(Collectors.toMap(name -> name, name -> parseNumber(request.getParameter(name))));
+        Map<String, String> strings = ScheduleHelper.getStringFields(request);
+        Map<String, Integer> numbers = ScheduleHelper.getNumberFields(request);
 
         Planner planner = new Planner();
         Schedule schedule = new Schedule();
@@ -114,14 +96,6 @@ public class NewScheduleServlet extends HttpServlet {
         Schedule createdSchedule = createScheduleResult.getData();
 
         response.sendRedirect(request.getContextPath() + "/schedule/" + createdSchedule.getId());
-    }
-
-    private Integer parseNumber(String value) {
-        try {
-            return Integer.parseInt(ServletHelper.trimString(value));
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
 }

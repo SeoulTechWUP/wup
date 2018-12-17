@@ -1,5 +1,10 @@
 package wup.servlet;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import wup.data.Group;
@@ -19,6 +24,35 @@ import wup.data.access.ScheduleDao;
  * @author Eunbin Jeong
  */
 class ScheduleHelper {
+    private static final String[] stringFields;
+    private static final String[] numberFields;
+
+    static {
+        stringFields = new String[] {
+                "title", "location", "allday", "description"
+        };
+
+        numberFields = new String[] {
+                "plannerId", "scheduleId", "start_year", "start_month", "start_date", "start_hour", "start_minute",
+                "end_year", "end_month", "end_date", "end_hour", "end_minute"
+        };
+    }
+
+    public static Map<String, String> getStringFields(HttpServletRequest request) {
+        return Arrays.stream(stringFields)
+                .collect(Collectors.toMap(x -> x, x -> ServletHelper.trimString(request.getParameter(x))));
+    }
+
+    public static Map<String, Integer> getNumberFields(HttpServletRequest request) {
+        return Arrays.stream(numberFields).collect(Collectors.toMap(x -> x, x -> {
+            try {
+                return Integer.parseInt(ServletHelper.trimString(request.getParameter(x)));
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }));
+    }
+
     public static class RequireResult {
         public final Schedule schedule;
         public final int errorCode;

@@ -65,7 +65,7 @@
                                                     </div>
                                                     <div id="Text">
 														<div class="scheduleInfo">
-															<label>일정 : </label>${post.getSchedule().startsAt} ~ ${post.getSchedule().endsAt} <br>
+															<label>일정 : </label><fmt:formatDate value="${post.getSchedule().startsAt}" pattern="yyyy.MM.dd" /> ~ <fmt:formatDate value="${post.getSchedule().endsAt}" pattern="yyyy.MM.dd" /><br>
 															<label>장소 : </label>${post.getSchedule().location}
 														</div>
                                                         <p>

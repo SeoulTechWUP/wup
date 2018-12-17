@@ -110,7 +110,7 @@
                                             <div style="text-align: center">
                                                 <button id="cancelButton" type="button">취소</button>
                                                 <c:if test="${mode eq 'edit'}">
-                                                    <button name="delete" type="button" class="red">일정 삭제</button>
+                                                    <button id="deleteButton" type="button" class="red">일정 삭제</button>
                                                 </c:if>
                                                 <input type="submit" class="tinted" value="저장"></button>
                                             </div>
@@ -120,6 +120,10 @@
                             </div>
                         </div>
                     </div>
+                </form>
+                <c:url var="deleteAction" value="/deleteSchedule" />
+                <form id="deleteForm" method="post" action="${deleteAction}">
+                    <input type="hidden" name="scheduleId" value="${schedule.id}">
                 </form>
             </div>
         </main>
@@ -132,9 +136,16 @@
     <script>
     (function () {
         let cancelButton = document.getElementById("cancelButton");
+        let deleteButton = document.getElementById("deleteButton");
 
         cancelButton.addEventListener("click", e => {
             history.go(-1);
+        }, false);
+
+        deleteButton.addEventListener("click", e => {
+            if (confirm("정말로 이 일정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")) {
+                document.getElementById("deleteForm").submit();
+            }
         }, false);
     })();
     </script>

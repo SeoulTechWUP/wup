@@ -102,13 +102,4 @@ public class ScheduleServlet extends HttpServlet {
         }
     }
 
-    /**
-     * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
-     */
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // TODO Auto-generated method stub
-    }
-
 }

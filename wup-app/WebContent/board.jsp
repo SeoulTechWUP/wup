@@ -61,7 +61,7 @@
                                                     </c:choose>  
                                                 </div>
                                                 <div class="expand" style="display:none;">
-                                                    <div id="Media">
+                                                    <div class="Media">
                                                     </div>
                                                     <div id="Text">
                                                         <p>
@@ -143,6 +143,7 @@
             if (e.style.display == "none") {
                 if (loadedList.indexOf(id) == -1) {
                     AjaxGetComments(id);
+                    AjaxGetMedia(id);
                     loadedList.push(id);
                 }
                 e.style.display = "block";
@@ -236,15 +237,55 @@
             });
         }
 
+        function AjaxGetMedia(id) {
+            $.ajaxSetup({
+                type: "GET",
+                async: true,
+                dataType: "json",
+                error: function (xhr) {
+                    console.log("error html = " + xhr.statusText);
+                }
+            });
+
+            $.ajax({
+                url: context + "/media/" + id,
+                beforeSend: function () {
+                    console.log("읽어오기 전...");
+                },
+                success: function (data) {
+                    $.each(data, function (idx, item) {
+                        if (data["result"] == "success" && idx == "data") {
+                            console.log("media를 정상적으로 조회하였습니다.");
+                            showMedia(item, id);
+                            return false;
+                        }
+                        else if (data["result"] == "fail") {
+                            console.log("media db 조회 접근 에러");
+                            return false;
+                        }
+                    });
+                }
+            });
+        }
+        
         function showMedia(item, id) {
             let media = JSON.parse(item);
             let e = selectElement(id, "Media");
             
             media.forEach(function (value) {
             	if (value["type"] == "IMAGE") {
-            		$(e).append("<img width=\"300px\" src=\"file://\"" + value["path"] + ">");
+            		let img = document.createElement("img");
+            		img.width = "300";
+            		img.src = context + value["path"];
+            		$(e).append(img);
             	} else {
-            		$(e).append("<video width=\"300px\" src=\"file://\"" + value["path"] + ">");
+            		let video = document.createElement("video");
+	        		video.width = "300";
+	        		video.src = context + value["path"];
+	        		video.muted = true;
+	        		video.autoplay = true;
+	        		video.loop = true;
+            		$(e).append(video);
             	}
             });
 

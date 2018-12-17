@@ -94,7 +94,11 @@
                             <div class="paper">
                                 <div class="contents">
                                     <header>
-                                        <h2>&nbsp;</h2>
+                                        <h2>
+                                            <c:if test="${mode eq 'edit'}">
+                                                <button id="shareButton" class="tinted" type="button">공유</button>
+                                            </c:if>
+                                        </h2>
                                     </header>
                                     <div class="main">
                                         <div id="schedule-description">
@@ -131,6 +135,7 @@
     (function () {
         let cancelButton = document.getElementById("cancelButton");
         let deleteButton = document.getElementById("deleteButton");
+        let shareButton = document.getElementById("shareButton");
 
         cancelButton.addEventListener("click", e => {
             history.go(-1);
@@ -140,6 +145,10 @@
             if (confirm("정말로 이 일정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")) {
                 document.getElementById("deleteForm").submit();
             }
+        }, false);
+
+        shareButton.addEventListener("click", e => {
+            location.href = `<c:url value="/postwrite/${schedule.id}" />`;
         }, false);
     })();
     </script>

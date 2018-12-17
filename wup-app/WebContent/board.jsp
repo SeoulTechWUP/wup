@@ -51,23 +51,30 @@
                                                     <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd" />
                                                     &nbsp;&nbsp;
                                                     <a class="expandPost" href="#">${post.title}</a> &nbsp;&nbsp;
-                                                    ${post.owner.getNickname()} &nbsp;&nbsp;
+                                                    <c:choose>
+                                                    	<c:when test="${post.getType() eq 'USER'}">
+                                                    		${post.owner.getNickname()} &nbsp;&nbsp;
+                                                    	</c:when>
+                                                    	<c:otherwise>
+                                                    		${post.owner.getName()} &nbsp;&nbsp;
+                                                    	</c:otherwise>
+                                                    </c:choose>  
                                                 </div>
                                                 <div class="expand" style="display:none;">
-                                                    <div id="Media">
-                                                        <div id="Image">
-                                                            <img alt="" src=""></img>
-                                                        </div>
-                                                        <div id="Text">
-                                                            <p>
-                                                                ${post.getText()}
-                                                            </p>
-                                                        </div>
+                                                    <div class="Media">
                                                     </div>
-
+                                                    <div id="Text">
+														<div class="scheduleInfo">
+															<label>일정 : </label><fmt:formatDate value="${post.getSchedule().startsAt}" pattern="yyyy.MM.dd" /> ~ <fmt:formatDate value="${post.getSchedule().endsAt}" pattern="yyyy.MM.dd" /><br>
+															<label>장소 : </label>${post.getSchedule().location}
+														</div>
+                                                        <p>
+                                                            ${post.getText()}
+                                                        </p>
+                                                    </div>
                                                     <div id="Like">
                                                         <button id="LikeButton">
-                                                            좋아요
+                                                        	좋아요
                                                         </button>
                                                     </div>
                                                     <div class="Comment">
@@ -139,21 +146,37 @@
             let e = selectElement(id, "expand");
             if (e.style.display == "none") {
                 if (loadedList.indexOf(id) == -1) {
-                    requestGetAjax(id);
+                    AjaxGetComments(id);
+                    AjaxGetMedia(id);
                     loadedList.push(id);
                 }
+                videoToggle(id);
                 e.style.display = "block";
             }
             else {
+            	videoToggle(id);
                 e.style.display = "none";
             }
         }
 
+        function videoToggle(id) {
+        	let e = selectElement(id, "Media");
+        	for(let el of e.children){
+        		if(el.tagName == "VIDEO"){
+        			if(el.paused) {
+        				el.play();
+        			} else {
+        				el.pause();
+        			}
+        		}
+        	}
+        }
+        
         function createComment(id) {
             let e = selectElement(id, "ContentArea");
 
             if ($(e).val() != "") {
-                requestPostAjax(id, $(e).val());
+            	AjaxPostComments(id, $(e).val());
                 e.value = "";
             }
             else {
@@ -161,7 +184,7 @@
             }
         }
 
-        function requestGetAjax(id) {
+        function AjaxGetComments(id) {
             $.ajaxSetup({
                 type: "GET",
                 async: true,
@@ -173,8 +196,8 @@
 
             $.ajax({
                 url: context + "/comment/" + id,
-                complete: function () {
-                    console.log("읽어오기 완료 후...");
+                beforeSend: function () {
+                    console.log("읽어오기 전...");
                 },
                 success: function (data) {
                     $.each(data, function (idx, item) {
@@ -192,7 +215,7 @@
             });
         }
 
-        function requestPostAjax(id, content) {
+        function AjaxPostComments(id, content) {
             $.ajaxSetup({
                 type: "POST",
                 async: true,
@@ -208,14 +231,14 @@
                     content: content,
                     postnum: id
                 },
-                complete: function () {
-                    console.log("읽어오기 완료 후...");
+                beforeSend: function () {
+                    console.log("읽어오기 전...");
                 },
                 success: function (data) {
                     $.each(data, function (idx, item) {
                         if (data["result"] == "success" && idx == "data") {
                             console.log("comment를 정상적으로 추가하였습니다.");
-                            requestGetAjax(id);
+                            AjaxGetComments(id);
                             return false;
                         }
                         else if (data["result"] == "userfail") {
@@ -233,8 +256,63 @@
             });
         }
 
+        function AjaxGetMedia(id) {
+            $.ajaxSetup({
+                type: "GET",
+                async: true,
+                dataType: "json",
+                error: function (xhr) {
+                    console.log("error html = " + xhr.statusText);
+                }
+            });
+
+            $.ajax({
+                url: context + "/media/" + id,
+                beforeSend: function () {
+                    console.log("읽어오기 전...");
+                },
+                success: function (data) {
+                    $.each(data, function (idx, item) {
+                        if (data["result"] == "success" && idx == "data") {
+                            console.log("media를 정상적으로 조회하였습니다.");
+                            showMedia(item, id);
+                            return false;
+                        }
+                        else if (data["result"] == "fail") {
+                            console.log("media db 조회 접근 에러");
+                            return false;
+                        }
+                    });
+                }
+            });
+        }
+        
+        function showMedia(item, id) {
+            let media = JSON.parse(item);
+            let e = selectElement(id, "Media");
+            
+            media.forEach(function (value) {
+            	if (value["type"] == "IMAGE") {
+            		let img = document.createElement("img");
+            		img.width = "300";
+            		img.src = context + value["path"];
+            		$(e).append(img);
+            	} else {
+            		let video = document.createElement("video");
+	        		video.width = "300";
+	        		video.src = context + value["path"];
+	        		video.muted = true;
+	        		video.autoplay = true;
+	        		video.loop = true;
+	        		$(video).hover(function(){video.setAttribute("controls","controls");},
+	        			function(){video.removeAttribute("controls");});
+            		$(e).append(video);
+            	}
+			});
+        }
+        
         function showComments(item, id) {
-            var comments = JSON.parse(item);
+            let comments = JSON.parse(item);
             let e = selectElement(id, "CommentList");
             $(e).empty();
 

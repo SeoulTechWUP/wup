@@ -35,7 +35,7 @@ public class MariaDbPostDao extends MariaDbDao implements PostDao {
     private static final String STUB_ALL = " ORDER BY `created_at` DESC";
     private static final String STUB_LIMIT = " ORDER BY `created_at` DESC LIMIT ?";
     private static final String STUB_RANGE = " AND `created_at` BETWEEN ? AND ? ORDER BY `created_at` DESC";
-    private static final String SQL_INSERT_FORMAT = "INSERT INTO `post` (`created_at`, `modified_at`, `type`, `%s_id`, `schedule_id`, `title`, `text) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_FORMAT = "INSERT INTO `post` (`created_at`, `modified_at`, `type`, `%s_id`, `schedule_id`, `title`, `text`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     public MariaDbPostDao(JdbcConnectionProvider connectionProvider) {
         super(connectionProvider);

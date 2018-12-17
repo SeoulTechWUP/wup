@@ -96,6 +96,10 @@
                         <div class="paper">
                             <div class="contents">
                                 <header>
+                                    <form method="get" action="<c:url value="/newSchedule" />">
+                                        <input type="hidden" name="plannerId" value="${planner.id}">
+                                        <input type="submit" class="tinted" value="새 일정">
+                                    </form>
                                 </header>
                                 <div class="main">
                                     <table class="calendar">

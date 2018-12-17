@@ -20,16 +20,10 @@
         <wup:appHeader />
         <main>
             <div id="planner-view">
-                <c:choose>
-                    <c:when test="${mode eq 'new'}">
-                        <c:url var="formAction" value="/newSchedule" />
-                        <form method="post" action="${formAction}" style="height: 100%">
-                    </c:when>
-                    <c:otherwise>
-                        <form method="post" style="height: 100%">
-                    </c:otherwise>
-                </c:choose>
+                <c:url var="formAction" value="/${mode eq 'new' ? 'new' : 'update'}Schedule" />
+                <form method="post" action="${formAction}" style="height: 100%">
                     <input type="hidden" name="plannerId" value="${plannerId}">
+                    <input type="hidden" name="scheduleId" value="${schedule.id}">
                     <div class="border">
                         <div class="left">
                             <div class="paper">

@@ -150,13 +150,28 @@
                     AjaxGetMedia(id);
                     loadedList.push(id);
                 }
+                videoToggle(id);
                 e.style.display = "block";
             }
             else {
+            	videoToggle(id);
                 e.style.display = "none";
             }
         }
 
+        function videoToggle(id) {
+        	let e = selectElement(id, "Media");
+        	for(let el of e.children){
+        		if(el.tagName == "VIDEO"){
+        			if(el.paused) {
+        				el.play();
+        			} else {
+        				el.pause();
+        			}
+        		}
+        	}
+        }
+        
         function createComment(id) {
             let e = selectElement(id, "ContentArea");
 

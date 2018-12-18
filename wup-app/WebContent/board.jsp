@@ -49,7 +49,7 @@
                                         <div class="expand" style="display:none;">
                                             <div class="Media">
                                             </div>
-                                            <div id="Text">
+                                            <div class="Text">
                                                 <div class="form-item">
                                                     <label class="header">일정</label><fmt:formatDate value="${post.getSchedule().startsAt}" pattern="yyyy.MM.dd" /> ~ <fmt:formatDate value="${post.getSchedule().endsAt}" pattern="yyyy.MM.dd" /><br>
                                                 </div>
@@ -60,7 +60,8 @@
                                                     ${post.getText()}
                                                 </p>
                                             </div>
-                                            <%--<div id="Like">
+                                            <hr>
+                                            <%--<div class="Like">
                                                 <button id="LikeButton">
                                                     좋아요
                                                 </button>
@@ -285,12 +286,10 @@
             media.forEach(function (value) {
                 if (value["type"] == "IMAGE") {
                     let img = document.createElement("img");
-                    img.width = "300";
                     img.src = context + value["path"];
                     $(e).append(img);
                 } else {
                     let video = document.createElement("video");
-                    video.width = "300";
                     video.src = context + value["path"];
                     video.muted = true;
                     video.autoplay = true;
@@ -305,22 +304,16 @@
         function showComments(item, id) {
             let comments = JSON.parse(item);
             let e = selectElement(id, "CommentList");
-            $(e).empty();
 
-            if (comments.length < 1) {
-                $(e).append("댓글이 없습니다.");
-                $(e).append("<br>");
-            }
-            else {
-                comments.forEach(function (value) {
-                    $(e).append(value["createdAt"]);
-                    $(e).append("&nbsp;&nbsp;");
-                    $(e).append(value["user"].nickname);
-                    $(e).append("&nbsp;&nbsp;");
-                    $(e).append(value["text"]);
-                    $(e).append("<br>");
-                });
-            }
+            e.innerHTML = "";
+
+            comments.forEach(function (value) {
+                e.innerHTML +=
+                    `<div class="comment-item">
+                        <span class="author">\${value["user"].nickname}</span><span class="date">\${value["createdAt"]}</span>
+                        <p>\${value["text"]}</p>
+                    </div>`;
+            });
         }
 
     </script>

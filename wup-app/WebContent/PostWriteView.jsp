@@ -72,37 +72,31 @@
         let videoSuccess = false;
         let success = false;
 
-        window.onload = function () {
-            document.getElementById("imageBtn").addEventListener("click", event => {
-                document.getElementById("image-file").click();
-            });
+        document.getElementById("imageBtn").addEventListener("click", event => {
+            document.getElementById("image-file").click();
+        }, false);
 
-            document.getElementById("videoBtn").addEventListener("click", event => {
-                document.getElementById("video-file").click();
-            });
+        document.getElementById("videoBtn").addEventListener("click", event => {
+            document.getElementById("video-file").click();
+        }, false);
 
-            document.getElementById("image-file").addEventListener("change", event => {
-                upload(document.getElementById("image-file"), "image");
-            });
+        document.getElementById("image-file").addEventListener("change", event => {
+            upload(document.getElementById("image-file"), "image");
+        }, false);
 
-            document.getElementById("video-file").addEventListener("change", event => {
-                upload(document.getElementById("video-file"), "video");
-            });
+        document.getElementById("video-file").addEventListener("change", event => {
+            upload(document.getElementById("video-file"), "video");
+        }, false);
 
-            document.getElementById("submit").addEventListener("click", event => {
-                submit();
-            });
+        document.getElementById("submit").addEventListener("click", event => submit(), false);
 
-            document.getElementById("abort").addEventListener("click", event => {
-                abort();
-            });
-        };
+        document.getElementById("abort").addEventListener("click", event => abort(), false);
 
         function MakeFormdata(type) {
             let filedata = new FormData();
             let nameArr = [];
 
-            let media = document.getElementsByClassName("mediaElement");
+            let media = document.getElementsByClassName("media-element");
 
             if (media == null || media.length == 0) {
                 return null;
@@ -278,26 +272,23 @@
                     let reader = new FileReader();
                     reader.addEventListener("load", event => {
                         let mediaDiv = document.createElement("div");
-                        mediaDiv.className = "mediaElement";
-                        mediaDiv.style = "display:inline-block;";
+                        mediaDiv.className = "media-element";
 
-                        let button = document.createElement("input");
+                        let button = document.createElement("button");
                         button.type = "button";
-                        button.id = "cancel";
-                        button.value = "x";
+                        button.className = "remove";
+                        button.innerHTML = "X";
 
                         let img = document.createElement("img");
                         let video = document.createElement("video");
 
                         if (type == "image") {
                             imageFiles.push(input.files[i]);
-                            img.width = "300";
                             img.src = event.target.result;
                             img.setAttribute("data-name", input.files[i].name);
                             mediaDiv.appendChild(img);
                         } else {
                             videoFiles.push(input.files[i]);
-                            video.width = "300";
                             video.src = event.target.result;
                             video.muted = true;
                             video.autoplay = true;

@@ -16,6 +16,8 @@
     <meta charset="UTF-8">
     <title>공유 게시판 | WUP</title>
     <wup:includeAssets />
+    <c:url var="boardCSS" value="/assets/css/board.css" />
+    <link rel="stylesheet" href="${boardCSS}">
 </head>
 
 <body>
@@ -24,88 +26,77 @@
         <main>
             <div id="planner-list">
                 <header>
-                    <h1>공유 게시판<a class="switch-category" href="<c:url value="/planners" />">개인</a><a class="switch-category"
-                            href="<c:url value="/groups" />">그룹</a></h1>
+                    <h1>공유 게시판<a class="switch-category" href="<c:url value="/planners" />">개인</a><a class="switch-category" href="<c:url value="/groups" />">그룹</a></h1>
                 </header>
                 <div>
-                    <table>
-                        <tr>
-                            <td>작성일</td>
-                            <td>제목</td>
-                            <td>작성자</td>
-                        </tr>
+                    <div class="post-list">
                         <c:choose>
                             <c:when test="${postlist.size() eq '0'}">
-                                <tr>
-                                    <td colspan="3">
-                                        <p>게시물이 없습니다.</p>
-                                    </td>
-                                </tr>
+                                <div class="empty">
+                                    <p>게시물이 없습니다.</p>
+                                </div>
                             </c:when>
                             <c:otherwise>
                                 <c:forEach items="${postlist}" var="post">
-                                    <tr>
-                                        <td colspan="3">
-                                            <div class="Post" data-post-id="${post.id}">
-                                                <div class="summary">
-                                                    <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd" />
-                                                    &nbsp;&nbsp;
-                                                    <a class="expandPost" href="#">${post.title}</a> &nbsp;&nbsp;
-                                                    <c:choose>
-                                                    	<c:when test="${post.getType() eq 'USER'}">
-                                                    		${post.owner.getNickname()} &nbsp;&nbsp;
-                                                    	</c:when>
-                                                    	<c:otherwise>
-                                                    		${post.owner.getName()} &nbsp;&nbsp;
-                                                    	</c:otherwise>
-                                                    </c:choose>  
+                                    <div class="Post" data-post-id="${post.id}">
+                                        <div class="summary expandPost">
+                                            <h3 class="title">${post.title}</h3>
+                                            <p>
+                                                <span class="date"><fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd" /></span><!--
+                                             --><span class="author">${post.type eq 'USER' ? post.owner.nickname : post.owner.name}</span>
+                                            </p>
+                                        </div>
+                                        <div class="expand" style="display:none;">
+                                            <div class="Media">
+                                            </div>
+                                            <div id="Text">
+                                                <div class="form-item">
+                                                    <label class="header">일정</label><fmt:formatDate value="${post.getSchedule().startsAt}" pattern="yyyy.MM.dd" /> ~ <fmt:formatDate value="${post.getSchedule().endsAt}" pattern="yyyy.MM.dd" /><br>
                                                 </div>
-                                                <div class="expand" style="display:none;">
-                                                    <div class="Media">
-                                                    </div>
-                                                    <div id="Text">
-														<div class="scheduleInfo">
-															<label>일정 : </label><fmt:formatDate value="${post.getSchedule().startsAt}" pattern="yyyy.MM.dd" /> ~ <fmt:formatDate value="${post.getSchedule().endsAt}" pattern="yyyy.MM.dd" /><br>
-															<label>장소 : </label>${post.getSchedule().location}
-														</div>
-                                                        <p>
-                                                            ${post.getText()}
-                                                        </p>
-                                                    </div>
-                                                    <div id="Like">
-                                                        <button id="LikeButton">
-                                                        	좋아요
-                                                        </button>
-                                                    </div>
-                                                    <div class="Comment">
-                                                        <div class="CommentList">
-                                                        </div>
-                                                        <div class="CommentInput">
-                                                            <textarea class="ContentArea" placeholder="댓글을 입력하세요."></textarea>
-                                                            <button class="CommentSubmitButton" type="submit">댓글달기</button>
-                                                        </div>
-                                                    </div>
+                                                <div class="form-item">
+                                                    <label class="header">장소</label>${post.getSchedule().location}
+                                                </div>
+                                                <p>
+                                                    ${post.getText()}
+                                                </p>
+                                            </div>
+                                            <%--<div id="Like">
+                                                <button id="LikeButton">
+                                                    좋아요
+                                                </button>
+                                            </div>--%>
+                                            <div class="Comment">
+                                                <div class="CommentList">
+                                                </div>
+                                                <div class="CommentInput">
+                                                    <textarea class="ContentArea" placeholder="댓글을 입력하세요."></textarea>
+                                                    <button class="CommentSubmitButton" type="submit">댓글달기</button>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </div>
                                 </c:forEach>
                             </c:otherwise>
                         </c:choose>
-                        <tr>
-                            <td colspan="3">
-                                <a href="<c:url value="/board/${PageBlockStart - PageBlockRange - 1}" />">이전</a> &nbsp;
-                                <c:forEach var="page" begin="${PageBlockStart}" end="${PageBlockStart + PageBlockRange - 1}"
-                                    step="1">
-                                    <a href="<c:url value="/board/${page}"/>"> <c:out value="${page}" /></a> &nbsp;
-                                </c:forEach>
-                                <a href="<c:url value="/board/${PageBlockStart + PageBlockRange}" />">다음</a>
-                            </td>
-                        </tr>
-                    </table>
+                    </div>
+                </div>
+                <div id="page-control">
+                    <div>
+                        <a href="<c:url value="/board/${PageBlockStart - PageBlockRange - 1}" />">이전</a> &nbsp;
+                        <c:forEach var="page" begin="${PageBlockStart}" end="${PageBlockStart + PageBlockRange - 1}"
+                            step="1">
+                            <a class="page-num" href="<c:url value="/board/${page}"/>"> <c:out value="${page}" /></a> &nbsp;
+                        </c:forEach>
+                        <a href="<c:url value="/board/${PageBlockStart + PageBlockRange}" />">다음</a>
+                    </div>
                 </div>
             </div>
         </main>
+        <div id="dropdown-container" class="dropdown-container"></div>
+        <div id="modal-container" class="modal-container" style="display: none">
+            <div class="fader" style="opacity: 0"></div>
+            <div class="contents"></div>
+        </div>
     </div>
 
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
@@ -154,29 +145,29 @@
                 e.style.display = "block";
             }
             else {
-            	videoToggle(id);
+                videoToggle(id);
                 e.style.display = "none";
             }
         }
 
         function videoToggle(id) {
-        	let e = selectElement(id, "Media");
-        	for(let el of e.children){
-        		if(el.tagName == "VIDEO"){
-        			if(el.paused) {
-        				el.play();
-        			} else {
-        				el.pause();
-        			}
-        		}
-        	}
+            let e = selectElement(id, "Media");
+            for(let el of e.children){
+                if(el.tagName == "VIDEO"){
+                    if(el.paused) {
+                        el.play();
+                    } else {
+                        el.pause();
+                    }
+                }
+            }
         }
         
         function createComment(id) {
             let e = selectElement(id, "ContentArea");
 
             if ($(e).val() != "") {
-            	AjaxPostComments(id, $(e).val());
+                AjaxPostComments(id, $(e).val());
                 e.value = "";
             }
             else {
@@ -292,23 +283,23 @@
             let e = selectElement(id, "Media");
             
             media.forEach(function (value) {
-            	if (value["type"] == "IMAGE") {
-            		let img = document.createElement("img");
-            		img.width = "300";
-            		img.src = context + value["path"];
-            		$(e).append(img);
-            	} else {
-            		let video = document.createElement("video");
-	        		video.width = "300";
-	        		video.src = context + value["path"];
-	        		video.muted = true;
-	        		video.autoplay = true;
-	        		video.loop = true;
-	        		$(video).hover(function(){video.setAttribute("controls","controls");},
-	        			function(){video.removeAttribute("controls");});
-            		$(e).append(video);
-            	}
-			});
+                if (value["type"] == "IMAGE") {
+                    let img = document.createElement("img");
+                    img.width = "300";
+                    img.src = context + value["path"];
+                    $(e).append(img);
+                } else {
+                    let video = document.createElement("video");
+                    video.width = "300";
+                    video.src = context + value["path"];
+                    video.muted = true;
+                    video.autoplay = true;
+                    video.loop = true;
+                    $(video).hover(function(){video.setAttribute("controls","controls");},
+                        function(){video.removeAttribute("controls");});
+                    $(e).append(video);
+                }
+            });
         }
         
         function showComments(item, id) {

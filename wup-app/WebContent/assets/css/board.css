@@ -1,0 +1,94 @@
+.post-list {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 100px;
+}
+
+.post-list .empty {
+    font-size: 2rem;
+    color: gray;
+    text-align: center;
+}
+
+.post-list .Post {
+    display: inline-block;
+    margin: 5px;
+}
+
+.post-list .Post .summary {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+    background: #64504f;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 0 transparent;
+    transition: transform 0.3s, box-shadow 0.3s;
+    z-index: 1000;
+}
+
+.post-list .Post .summary:hover {
+    transform: translate(0, -3px);
+    box-shadow: 0 3px 20px black;
+}
+
+.post-list .Post .summary:active {
+    transform: translate(0, 0);
+    box-shadow: 0 1px 5px black;
+}
+
+.post-list .Post .summary h3,
+.post-list .Post .summary p {
+    color: white;
+    margin: 0;
+}
+
+.post-list .Post .summary .date:after {
+    display: inline-block;
+    margin: 0 0.5rem;
+    content: '|';
+    opacity: 0.25;
+}
+
+.post-list .Post .summary .author:before {
+    content: '작성자: ';
+}
+
+.post-list .Post .expand {
+    margin: -1rem 1rem 1rem 1rem;
+    padding: 2rem 1rem 1rem 1rem;
+    background: whitesmoke;
+    box-shadow: inset rgba(0, 0, 0, 0.5) 0 calc(1rem + 5px) 15px;
+    border-radius: 5px;
+}
+
+#page-control {
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+}
+
+#page-control > div {
+    display: inline-block;
+    margin: 1em;
+    padding: 0.5em 1em;
+    border-radius: 2147483647px;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 2147483647;
+}
+
+#page-control a:link,
+#page-control a:visited,
+#page-control a:active {
+    color: #eee;
+    text-decoration: none;
+}
+
+#page-control a.page-num {
+    font-weight: bold;
+}

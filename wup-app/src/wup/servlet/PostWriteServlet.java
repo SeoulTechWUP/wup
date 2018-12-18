@@ -140,7 +140,7 @@ public class PostWriteServlet extends HttpServlet {
 
         DaoResult<Post> createPost;
 
-        if (request.getParameter("ownertype") == "USER") {
+        if (request.getParameter("ownertype").equals("USER")) {
             createPost = PostDao.createPost(user, post);
         } else {
             Group group = new Group();
